@@ -228,7 +228,7 @@ struct MotivationCard: View {
         } else if distance > 5000 {
             return "💪 今日も5km突破！指の筋トレが順調です"
         } else if distance > 1000 {
-            return "👑 スクロール王の称号に近づいています"
+            return "📱 スクロールチェッカーマスターに近づいています"
         } else {
             return "📱 今日のスクロール活動、開始です！"
         }
@@ -497,7 +497,7 @@ struct HumorConversionCard: View {
     
     private func shareToSNS() {
         let distance = scrollDataManager.todayTotalDistance
-        let text = "今日は\(Int(distance))mスクロールしました！\(conversionText) #スクロール王 #デジタルデトックス"
+        let text = "今日は\(Int(distance))mスクロールしました！\(conversionText) #スクロールチェッカー #デジタルデトックス"
         
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         

@@ -46,7 +46,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>スクロール王</string>
+	<string>スクロールチェッカー</string>
 	<key>CFBundleName</key>
 	<string>ScrollCounter</string>
 	<key>CFBundleIdentifier</key>

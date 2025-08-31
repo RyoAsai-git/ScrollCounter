@@ -86,7 +86,7 @@ class NotificationManager: ObservableObject {
         } else if todayDistance >= 5000 {
             return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！マラソン級の運動量です"
         } else if todayDistance >= 1000 {
-            return "👑 今日は\(formatDistance(todayDistance))スクロール！スクロール王の称号獲得です"
+            return "📱 今日は\(formatDistance(todayDistance))スクロール！スクロールチェッカーマスター認定です"
         } else if todayDistance >= 500 {
             return "💪 今日は\(formatDistance(todayDistance))スクロール！指の筋トレ効果抜群です"
         } else {
