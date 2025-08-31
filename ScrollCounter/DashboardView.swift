@@ -223,12 +223,22 @@ struct MotivationCard: View {
         let distance = scrollDataManager.todayTotalDistance
         let yesterdayDistance = scrollDataManager.yesterdayTotalDistance
         
-        if distance > yesterdayDistance {
+        if distance > yesterdayDistance && distance > 1000 {
             return "🎉 今日も絶好調！昨日より\(Int(distance - yesterdayDistance))m多くスクロールしています"
-        } else if distance > 5000 {
-            return "💪 今日も5km突破！指の筋トレが順調です"
-        } else if distance > 1000 {
+        } else if distance >= 10000 {
+            return "🏃‍♂️ 今日は10km突破！陸上競技場25周レベルです"
+        } else if distance >= 5000 {
+            return "💪 今日も5km突破！5kmランニング完走レベルです"
+        } else if distance >= 3000 {
+            return "🚶‍♀️ 今日は3km到達！40分散歩と同じ距離です"
+        } else if distance >= 1609 {
+            return "🏃‍♂️ 1マイル(1.609km)ランニング達成！"
+        } else if distance >= 1000 {
             return "📱 スクロールチェッカーマスターに近づいています"
+        } else if distance >= 400 {
+            return "🏃‍♂️ 陸上競技場1周(400m)レベル到達！"
+        } else if distance >= 100 {
+            return "💪 陸上100m走レベルクリア！"
         } else {
             return "📱 今日のスクロール活動、開始です！"
         }
@@ -444,16 +454,42 @@ struct HumorConversionCard: View {
     var conversionText: String {
         let distance = scrollDataManager.todayTotalDistance
         
-        if distance >= 10000 {
-            return "🚄 東京→大阪の新幹線と同じ距離をスクロール！"
+        if distance >= 42195 {
+            return "🏃‍♂️ フルマラソン(42.195km)完走と同じ距離をスクロール！"
+        } else if distance >= 21098 {
+            return "🏃‍♀️ ハーフマラソン(21.098km)完走と同じ距離をスクロール！"
+        } else if distance >= 10000 {
+            return "🏃‍♂️ 陸上競技場25周(10km)と同じ距離をスクロール！"
+        } else if distance >= 7000 {
+            return "🚇 東京駅から渋谷駅(7km)と同じ距離をスクロール！"
         } else if distance >= 5000 {
-            return "🏃‍♂️ 5kmマラソンと同じ距離をスクロール！"
+            return "🏃‍♂️ 5kmランニングと同じ距離をスクロール！"
+        } else if distance >= 3000 {
+            return "🚶‍♀️ 徒歩約40分(3km)の散歩と同じ距離をスクロール！"
+        } else if distance >= 1852 {
+            return "⛵ 1海里(1.852km)の航海と同じ距離をスクロール！"
+        } else if distance >= 1609 {
+            return "🏃‍♂️ 1マイル(1.609km)ランニングと同じ距離をスクロール！"
         } else if distance >= 1000 {
-            return "🚶‍♀️ 東京駅から渋谷駅までの距離をスクロール！"
-        } else if distance >= 500 {
-            return "🏢 東京スカイツリーを約1往復分スクロール！"
+            return "🚶‍♀️ 1kmウォーキングと同じ距離をスクロール！"
+        } else if distance >= 800 {
+            return "🏃‍♂️ 陸上競技場2周(800m)と同じ距離をスクロール！"
+        } else if distance >= 634 {
+            return "🏢 東京スカイツリー(634m)の高さ分をスクロール！"
+        } else if distance >= 400 {
+            return "🏃‍♂️ 陸上競技場1周(400m)と同じ距離をスクロール！"
+        } else if distance >= 333 {
+            return "🗼 東京タワー(333m)の高さ分をスクロール！"
+        } else if distance >= 200 {
+            return "🏊‍♂️ 25mプール8往復(200m)と同じ距離をスクロール！"
+        } else if distance >= 110 {
+            return "⚽ サッカーコート(110m)1面分をスクロール！"
         } else if distance >= 100 {
-            return "⚽ サッカーコート1面分をスクロール！"
+            return "🏃‍♂️ 陸上100m走と同じ距離をスクロール！"
+        } else if distance >= 50 {
+            return "🏊‍♂️ 25mプール1往復(50m)と同じ距離をスクロール！"
+        } else if distance >= 25 {
+            return "🏊‍♂️ 25mプール1本分をスクロール！"
         } else {
             return "🏠 家の中を歩き回った距離をスクロール！"
         }

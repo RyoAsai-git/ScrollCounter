@@ -81,14 +81,32 @@ class NotificationManager: ObservableObject {
         }
         
         // ユーモアメッセージ
-        if todayDistance >= 10000 {
-            return "🚄 今日は\(formatDistance(todayDistance))スクロール！新幹線級の移動距離です"
+        if todayDistance >= 42195 {
+            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！フルマラソン(42.195km)完走レベルです"
+        } else if todayDistance >= 21098 {
+            return "🏃‍♀️ 今日は\(formatDistance(todayDistance))スクロール！ハーフマラソン(21.098km)完走レベルです"
+        } else if todayDistance >= 10000 {
+            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！陸上競技場25周(10km)と同じ距離です"
+        } else if todayDistance >= 7000 {
+            return "🚇 今日は\(formatDistance(todayDistance))スクロール！東京駅〜渋谷駅(7km)の移動距離です"
         } else if todayDistance >= 5000 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！マラソン級の運動量です"
+            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！5kmランニング完走レベルです"
+        } else if todayDistance >= 3000 {
+            return "🚶‍♀️ 今日は\(formatDistance(todayDistance))スクロール！40分散歩(3km)と同じ距離です"
+        } else if todayDistance >= 1609 {
+            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！1マイル(1.609km)ランニングレベルです"
         } else if todayDistance >= 1000 {
             return "📱 今日は\(formatDistance(todayDistance))スクロール！スクロールチェッカーマスター認定です"
-        } else if todayDistance >= 500 {
-            return "💪 今日は\(formatDistance(todayDistance))スクロール！指の筋トレ効果抜群です"
+        } else if todayDistance >= 634 {
+            return "🏢 今日は\(formatDistance(todayDistance))スクロール！東京スカイツリー(634m)の高さ分です"
+        } else if todayDistance >= 400 {
+            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！陸上競技場1周(400m)レベルです"
+        } else if todayDistance >= 333 {
+            return "🗼 今日は\(formatDistance(todayDistance))スクロール！東京タワー(333m)の高さ分です"
+        } else if todayDistance >= 200 {
+            return "🏊‍♂️ 今日は\(formatDistance(todayDistance))スクロール！25mプール8往復(200m)レベルです"
+        } else if todayDistance >= 100 {
+            return "💪 今日は\(formatDistance(todayDistance))スクロール！陸上100m走と同じ距離です"
         } else {
             return "📱 今日は\(formatDistance(todayDistance))スクロール！明日も頑張りましょう"
         }
