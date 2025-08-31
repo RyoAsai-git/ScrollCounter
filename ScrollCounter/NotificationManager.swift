@@ -7,7 +7,7 @@ class NotificationManager: ObservableObject {
     @Published var hasPermission = false
     @Published var notificationTime = Calendar.current.date(from: DateComponents(hour: 21, minute: 0)) ?? Date()
     @Published var isNotificationEnabled = true
-    @Published var humorNotificationsEnabled = true
+    @Published var detoxNotificationsEnabled = true
     
     private let notificationCenter = UNUserNotificationCenter.current()
     
@@ -76,39 +76,39 @@ class NotificationManager: ObservableObject {
         // 今日のスクロール距離を取得（実際のアプリではScrollDataManagerから取得）
         let todayDistance = await getCurrentScrollDistance()
         
-        if !humorNotificationsEnabled {
+        if !detoxNotificationsEnabled {
             return "今日は\(formatDistance(todayDistance))スクロールしました。"
         }
         
-        // ユーモアメッセージ
+        // デジタルデトックス促進メッセージ
         if todayDistance >= 42195 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！フルマラソン(42.195km)完走レベルです"
+            return "🚨 今日は\(formatDistance(todayDistance))もスクロール！フルマラソン分です...今すぐデバイスから離れて休憩を"
         } else if todayDistance >= 21098 {
-            return "🏃‍♀️ 今日は\(formatDistance(todayDistance))スクロール！ハーフマラソン(21.098km)完走レベルです"
+            return "⚠️ \(formatDistance(todayDistance))のスクロール...ハーフマラソン分の負担が指と目にかかっています"
         } else if todayDistance >= 10000 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！陸上競技場25周(10km)と同じ距離です"
+            return "😰 \(formatDistance(todayDistance))スクロール...陸上競技場25周分です。長時間の休憩をお勧めします"
         } else if todayDistance >= 7000 {
-            return "🚇 今日は\(formatDistance(todayDistance))スクロール！東京駅〜渋谷駅(7km)の移動距離です"
+            return "💭 \(formatDistance(todayDistance))スクロール...東京駅〜渋谷駅分も画面を見続けました。目を休めましょう"
         } else if todayDistance >= 5000 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！5kmランニング完走レベルです"
+            return "⏰ \(formatDistance(todayDistance))スクロール...5km分です。30分の休憩はいかがですか？"
         } else if todayDistance >= 3000 {
-            return "🚶‍♀️ 今日は\(formatDistance(todayDistance))スクロール！40分散歩(3km)と同じ距離です"
+            return "🚶‍♀️ \(formatDistance(todayDistance))スクロール...リアル散歩(3km)より画面を見ています"
         } else if todayDistance >= 1609 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！1マイル(1.609km)ランニングレベルです"
+            return "🏃‍♂️ \(formatDistance(todayDistance))スクロール...1マイル分です。実際に歩いてみませんか？"
         } else if todayDistance >= 1000 {
-            return "📱 今日は\(formatDistance(todayDistance))スクロール！スクロールチェッカーマスター認定です"
+            return "📱 \(formatDistance(todayDistance))スクロール...1km分です。適度な休憩を心がけましょう"
         } else if todayDistance >= 634 {
-            return "🏢 今日は\(formatDistance(todayDistance))スクロール！東京スカイツリー(634m)の高さ分です"
+            return "🏢 \(formatDistance(todayDistance))スクロール...スカイツリー分の縦移動です。首と目を休めて"
         } else if todayDistance >= 400 {
-            return "🏃‍♂️ 今日は\(formatDistance(todayDistance))スクロール！陸上競技場1周(400m)レベルです"
+            return "🏃‍♂️ \(formatDistance(todayDistance))スクロール...競技場1周分です。立ち上がってストレッチを"
         } else if todayDistance >= 333 {
-            return "🗼 今日は\(formatDistance(todayDistance))スクロール！東京タワー(333m)の高さ分です"
+            return "🗼 \(formatDistance(todayDistance))スクロール...東京タワー分です。遠くを見て目を休めましょう"
         } else if todayDistance >= 200 {
-            return "🏊‍♂️ 今日は\(formatDistance(todayDistance))スクロール！25mプール8往復(200m)レベルです"
+            return "👀 \(formatDistance(todayDistance))スクロール...瞬きを忘れずに、20-20-20ルールを試してみて"
         } else if todayDistance >= 100 {
-            return "💪 今日は\(formatDistance(todayDistance))スクロール！陸上100m走と同じ距離です"
+            return "😊 \(formatDistance(todayDistance))スクロール...まだ健康的な範囲です。この調子をキープ"
         } else {
-            return "📱 今日は\(formatDistance(todayDistance))スクロール！明日も頑張りましょう"
+            return "✨ \(formatDistance(todayDistance))スクロール...控えめで素晴らしいです！バランスの取れたデジタルライフを"
         }
     }
     
@@ -149,8 +149,8 @@ class NotificationManager: ObservableObject {
         }
     }
     
-    func toggleHumorNotifications(_ enabled: Bool) {
-        humorNotificationsEnabled = enabled
+    func toggleDetoxNotifications(_ enabled: Bool) {
+        detoxNotificationsEnabled = enabled
         saveSettings()
         
         Task {
@@ -161,13 +161,13 @@ class NotificationManager: ObservableObject {
     // MARK: - 設定の保存/読み込み
     private func saveSettings() {
         UserDefaults.standard.set(isNotificationEnabled, forKey: "isNotificationEnabled")
-        UserDefaults.standard.set(humorNotificationsEnabled, forKey: "humorNotificationsEnabled")
+        UserDefaults.standard.set(detoxNotificationsEnabled, forKey: "detoxNotificationsEnabled")
         UserDefaults.standard.set(notificationTime, forKey: "notificationTime")
     }
     
     private func loadSettings() {
         isNotificationEnabled = UserDefaults.standard.object(forKey: "isNotificationEnabled") as? Bool ?? true
-        humorNotificationsEnabled = UserDefaults.standard.object(forKey: "humorNotificationsEnabled") as? Bool ?? true
+        detoxNotificationsEnabled = UserDefaults.standard.object(forKey: "detoxNotificationsEnabled") as? Bool ?? true
         
         if let savedTime = UserDefaults.standard.object(forKey: "notificationTime") as? Date {
             notificationTime = savedTime

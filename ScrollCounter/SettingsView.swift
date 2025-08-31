@@ -165,18 +165,18 @@ struct SettingsView: View {
                 }
                 
                 HStack {
-                    Image(systemName: "face.smiling")
-                        .foregroundColor(.purple)
+                    Image(systemName: "leaf.arrow.circlepath")
+                        .foregroundColor(.green)
                         .frame(width: 24)
                     
-                    Text("ユーモア通知")
+                    Text("デトックス通知")
                     
                     Spacer()
                     
                     Toggle("", isOn: Binding(
-                        get: { notificationManager.humorNotificationsEnabled },
+                        get: { notificationManager.detoxNotificationsEnabled },
                         set: { newValue in
-                            notificationManager.toggleHumorNotifications(newValue)
+                            notificationManager.toggleDetoxNotifications(newValue)
                         }
                     ))
                 }

@@ -26,8 +26,8 @@ struct DashboardView: View {
                     // アプリ別ランキング
                     AppRankingCard()
                     
-                    // ネタ換算カード
-                    HumorConversionCard()
+                    // デジタルデトックス促進カード
+                    DigitalDetoxCard()
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
@@ -223,33 +223,33 @@ struct MotivationCard: View {
         let distance = scrollDataManager.todayTotalDistance
         let yesterdayDistance = scrollDataManager.yesterdayTotalDistance
         
-        if distance > yesterdayDistance && distance > 1000 {
-            return "🎉 今日も絶好調！昨日より\(Int(distance - yesterdayDistance))m多くスクロールしています"
+        if distance > yesterdayDistance && distance > 2000 {
+            return "⚠️ 昨日より\(Int(distance - yesterdayDistance))m多くスクロール中...休憩時間を増やしませんか？"
         } else if distance >= 10000 {
-            return "🏃‍♂️ 今日は10km突破！陸上競技場25周レベルです"
+            return "🚨 スクロール量が10kmに...デジタル疲労が心配です"
         } else if distance >= 5000 {
-            return "💪 今日も5km突破！5kmランニング完走レベルです"
+            return "⏰ 5km分のスクロール...30分の休憩をお勧めします"
         } else if distance >= 3000 {
-            return "🚶‍♀️ 今日は3km到達！40分散歩と同じ距離です"
+            return "💭 3km分も画面を見続けています...目を休めませんか？"
         } else if distance >= 1609 {
-            return "🏃‍♂️ 1マイル(1.609km)ランニング達成！"
+            return "📱 1マイル分のスクロール...適度な休憩を心がけましょう"
         } else if distance >= 1000 {
-            return "📱 スクロールチェッカーマスターに近づいています"
+            return "👀 1km分のスクロール...瞬きを忘れずに"
         } else if distance >= 400 {
-            return "🏃‍♂️ 陸上競技場1周(400m)レベル到達！"
+            return "😌 400m分のスクロール...まだ健康的な範囲です"
         } else if distance >= 100 {
-            return "💪 陸上100m走レベルクリア！"
+            return "👍 適度なスクロール量をキープしています"
         } else {
-            return "📱 今日のスクロール活動、開始です！"
+            return "✨ 今日は控えめなスクロール...素晴らしい自制心です！"
         }
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
-                Text("モチベーション")
+                Image(systemName: "heart.text.square")
+                    .foregroundColor(.green)
+                Text("健康アドバイス")
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -447,60 +447,60 @@ struct AppRankingRow: View {
     }
 }
 
-// MARK: - ネタ換算カード
-struct HumorConversionCard: View {
+// MARK: - デジタルデトックス促進カード
+struct DigitalDetoxCard: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
     
     var conversionText: String {
         let distance = scrollDataManager.todayTotalDistance
         
         if distance >= 42195 {
-            return "🏃‍♂️ フルマラソン(42.195km)完走と同じ距離をスクロール！"
+            return "⚠️ フルマラソン分もスクロール...指の疲労が心配です"
         } else if distance >= 21098 {
-            return "🏃‍♀️ ハーフマラソン(21.098km)完走と同じ距離をスクロール！"
+            return "😰 ハーフマラソン分のスクロール...休憩しませんか？"
         } else if distance >= 10000 {
-            return "🏃‍♂️ 陸上競技場25周(10km)と同じ距離をスクロール！"
+            return "📱💦 10kmも親指で移動...デジタル疲労に注意"
         } else if distance >= 7000 {
-            return "🚇 東京駅から渋谷駅(7km)と同じ距離をスクロール！"
+            return "🚇😵 東京駅〜渋谷駅分も画面を見続けました"
         } else if distance >= 5000 {
-            return "🏃‍♂️ 5kmランニングと同じ距離をスクロール！"
+            return "⏰ 5km分のスクロール...外の散歩はいかがですか？"
         } else if distance >= 3000 {
-            return "🚶‍♀️ 徒歩約40分(3km)の散歩と同じ距離をスクロール！"
+            return "🚶‍♀️ リアル散歩(3km)より画面を見ています"
         } else if distance >= 1852 {
-            return "⛵ 1海里(1.852km)の航海と同じ距離をスクロール！"
+            return "⛵ 1海里分のスクロール...目を休めましょう"
         } else if distance >= 1609 {
-            return "🏃‍♂️ 1マイル(1.609km)ランニングと同じ距離をスクロール！"
+            return "🏃‍♂️ 1マイル分...実際に走った方が健康的かも"
         } else if distance >= 1000 {
-            return "🚶‍♀️ 1kmウォーキングと同じ距離をスクロール！"
+            return "📱🤔 1km分のスクロール...ちょっと多くないですか？"
         } else if distance >= 800 {
-            return "🏃‍♂️ 陸上競技場2周(800m)と同じ距離をスクロール！"
+            return "🏃‍♂️ 競技場2周分...実際の運動も忘れずに"
         } else if distance >= 634 {
-            return "🏢 東京スカイツリー(634m)の高さ分をスクロール！"
+            return "🏢 スカイツリー分の縦スクロール...首は大丈夫？"
         } else if distance >= 400 {
-            return "🏃‍♂️ 陸上競技場1周(400m)と同じ距離をスクロール！"
+            return "🏃‍♂️ 競技場1周分...立ち上がってストレッチを"
         } else if distance >= 333 {
-            return "🗼 東京タワー(333m)の高さ分をスクロール！"
+            return "🗼 東京タワー分...目の高さを変えて休憩を"
         } else if distance >= 200 {
-            return "🏊‍♂️ 25mプール8往復(200m)と同じ距離をスクロール！"
+            return "🏊‍♂️ プール8往復分...瞬きを忘れていませんか？"
         } else if distance >= 110 {
-            return "⚽ サッカーコート(110m)1面分をスクロール！"
+            return "⚽ サッカーコート分...外の緑を見ませんか？"
         } else if distance >= 100 {
-            return "🏃‍♂️ 陸上100m走と同じ距離をスクロール！"
+            return "🏃‍♂️ 100m分のスクロール...まだ適度な範囲です"
         } else if distance >= 50 {
-            return "🏊‍♂️ 25mプール1往復(50m)と同じ距離をスクロール！"
+            return "🏊‍♂️ プール往復分...良いペースですね"
         } else if distance >= 25 {
-            return "🏊‍♂️ 25mプール1本分をスクロール！"
+            return "😊 適度なスクロール量です"
         } else {
-            return "🏠 家の中を歩き回った距離をスクロール！"
+            return "✨ 今日はまだ控えめ...良い習慣です！"
         }
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "sparkles")
-                    .foregroundColor(.purple)
-                Text("今日のスクロール換算")
+                Image(systemName: "exclamationmark.triangle")
+                    .foregroundColor(.orange)
+                Text("デジタル使用状況")
                     .font(.headline)
                     .fontWeight(.semibold)
                 Spacer()
@@ -513,8 +513,8 @@ struct HumorConversionCard: View {
             
             HStack {
                 Spacer()
-                Button("SNSでシェア") {
-                    shareToSNS()
+                Button("デトックス開始") {
+                    startDigitalDetox()
                 }
                 .font(.caption)
                 .foregroundColor(.blue)
@@ -531,15 +531,33 @@ struct HumorConversionCard: View {
         )
     }
     
-    private func shareToSNS() {
+    private func startDigitalDetox() {
         let distance = scrollDataManager.todayTotalDistance
-        let text = "今日は\(Int(distance))mスクロールしました！\(conversionText) #スクロールチェッカー #デジタルデトックス"
+        var detoxMessage = ""
         
-        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        if distance >= 5000 {
+            detoxMessage = "⏰ 今日のスクロール量を見直し、30分間デバイスから離れませんか？\n🌿 散歩、読書、瞑想などをお試しください。"
+        } else if distance >= 1000 {
+            detoxMessage = "📱 適度な休憩を取りましょう！\n👀 20-20-20ルール：20分ごとに20秒間、20フィート先を見る"
+        } else {
+            detoxMessage = "😊 良いペースです！この調子でバランスの取れたデジタルライフを続けましょう。"
+        }
+        
+        let alert = UIAlertController(
+            title: "デジタルデトックスのお誘い",
+            message: detoxMessage,
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "休憩する", style: .default) { _ in
+            // デトックスタイマー開始（実装可能）
+        })
+        
+        alert.addAction(UIAlertAction(title: "後で", style: .cancel))
         
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
-            window.rootViewController?.present(activityVC, animated: true)
+            window.rootViewController?.present(alert, animated: true)
         }
     }
 }
