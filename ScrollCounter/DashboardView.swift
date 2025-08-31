@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
-    @EnvironmentObject var autoScrollDetector: AutoScrollDetector
     @State private var showMotivationMessage = false
     
     var body: some View {
@@ -79,7 +78,6 @@ struct DashboardView: View {
 
 // MARK: - 自動検出状況カード
 struct AutoDetectionStatusCard: View {
-    @EnvironmentObject var autoScrollDetector: AutoScrollDetector
     @EnvironmentObject var scrollDataManager: ScrollDataManager
     
     var body: some View {
@@ -103,11 +101,11 @@ struct AutoDetectionStatusCard: View {
             
             HStack(spacing: 20) {
                 VStack(spacing: 4) {
-                    Text("検出済み距離")
+                    Text("自動検出済み")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("\(Int(autoScrollDetector.totalDetectedDistance))m")
+                    Text("\(Int(scrollDataManager.autoDetectedDistance))m")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.green)
