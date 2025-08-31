@@ -27,6 +27,12 @@ struct SettingsView: View {
             .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.large)
         }
+        .onAppear {
+            // 画面表示時にスクロール検出
+            Task {
+                await simulateScrollDetection(appName: "設定", distance: 20.0)
+            }
+        }
         .alert("アクセシビリティ設定", isPresented: $showingAccessibilityAlert) {
             Button("設定を開く") {
                 openAccessibilitySettings()
@@ -43,6 +49,18 @@ struct SettingsView: View {
         } message: {
             Text("通知を受け取るには、設定アプリで通知権限を有効にしてください。")
         }
+    }
+    
+    // MARK: - スクロール検出シミュレーション
+    private func simulateScrollDetection(appName: String, distance: Double) async {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ScrollDetected"),
+            object: nil,
+            userInfo: [
+                "distance": distance,
+                "appName": appName
+            ]
+        )
     }
     
     // MARK: - アクセシビリティ設定セクション

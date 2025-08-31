@@ -37,6 +37,13 @@ struct ContentView: View {
                 .tag(2)
         }
         .accentColor(.blue)
+        .onChange(of: selectedTab) { newTab in
+            // タブ切り替え時にスクロール検出をシミュレート
+            let tabName = ["ダッシュボード", "履歴", "設定"][newTab]
+            Task {
+                await simulateScrollDetection(appName: "タブ切り替え", distance: 15.0)
+            }
+        }
         .onAppear {
             // アプリ起動時の初期化処理
             Task {
@@ -55,6 +62,18 @@ struct ContentView: View {
                 await scrollDataManager.refreshData()
             }
         }
+    }
+    
+    // MARK: - スクロール検出シミュレーション
+    private func simulateScrollDetection(appName: String, distance: Double) async {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ScrollDetected"),
+            object: nil,
+            userInfo: [
+                "distance": distance,
+                "appName": appName
+            ]
+        )
     }
 }
 

@@ -40,10 +40,30 @@ struct ChartView: View {
             .navigationTitle("スクロール履歴")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
+                // スクロール検出：プルリフレッシュ時にスクロール距離を記録
+                await simulateScrollDetection(appName: "履歴", distance: 40.0)
                 await scrollDataManager.refreshData()
             }
         }
         .environmentObject(scrollDataManager)
+        .onAppear {
+            // 画面表示時にスクロール検出
+            Task {
+                await simulateScrollDetection(appName: "履歴", distance: 25.0)
+            }
+        }
+    }
+    
+    // MARK: - スクロール検出シミュレーション
+    private func simulateScrollDetection(appName: String, distance: Double) async {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ScrollDetected"),
+            object: nil,
+            userInfo: [
+                "distance": distance,
+                "appName": appName
+            ]
+        )
     }
     
     // MARK: - 時間範囲選択

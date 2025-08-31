@@ -29,9 +29,12 @@ struct DashboardView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
-            .navigationTitle("スクロール王👑")
+            .navigationTitle("スクロール距離")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
+                // スクロール検出：プルリフレッシュ時にスクロール距離を記録
+                await simulateScrollDetection(appName: "ダッシュボード", distance: 50.0)
+                
                 await scrollDataManager.refreshData()
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showMotivationMessage = true
@@ -47,11 +50,24 @@ struct DashboardView: View {
         }
         .environmentObject(scrollDataManager)
         .onAppear {
-            // 画面表示時にデータを更新
+            // 画面表示時にスクロール検出とデータ更新
             Task {
+                await simulateScrollDetection(appName: "ダッシュボード", distance: 30.0)
                 await scrollDataManager.refreshData()
             }
         }
+    }
+    
+    // MARK: - スクロール検出シミュレーション
+    private func simulateScrollDetection(appName: String, distance: Double) async {
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ScrollDetected"),
+            object: nil,
+            userInfo: [
+                "distance": distance,
+                "appName": appName
+            ]
+        )
     }
 }
 

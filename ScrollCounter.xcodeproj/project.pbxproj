@@ -20,7 +20,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1234580291A1B1C1D1E1F01 /* ScrollCounter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollCounter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A123456B291A1B1C1D1E1F02 /* ScrollCounterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollCounterApp.swift; sourceTree = "<group>"; };
 		A123456D291A1B1C1D1E1F04 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A123456F291A1B1C1D1E1F06 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
@@ -31,6 +30,7 @@
 		A123457A291A1B1C1D1E1F17 /* ScrollData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ScrollData.xcdatamodel; sourceTree = "<group>"; };
 		A123457D291A1B1C1D1E1F20 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A123457F291A1B1C1D1E1F22 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A1234580291A1B1C1D1E1F01 /* ScrollCounter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollCounter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1234581291A1B1C1D1E1F23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -71,20 +71,20 @@
 			path = ScrollCounter;
 			sourceTree = "<group>";
 		};
-		A1234586291A1B1C1D1E1F24 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				A123457F291A1B1C1D1E1F22 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
 		A1234585291A1B1C1D1E1FFF /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				A1234580291A1B1C1D1E1F01 /* ScrollCounter.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A1234586291A1B1C1D1E1F24 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A123457F291A1B1C1D1E1F22 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,6 +298,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScrollCounter/Preview Content\"";
+				DEVELOPMENT_TEAM = 4B453P8N55;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollCounter/Info.plist;
@@ -327,6 +328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ScrollCounter/Preview Content\"";
+				DEVELOPMENT_TEAM = 4B453P8N55;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollCounter/Info.plist;
@@ -351,20 +353,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A123458C291A1B1C1D1E1FFC /* Build configuration list for PBXProject "ScrollCounter" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A123458D291A1B1C1D1E1F26 /* Debug */,
-				A123458E291A1B1C1D1E1F27 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A1234588291A1B1C1D1E1F25 /* Build configuration list for PBXNativeTarget "ScrollCounter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A123458F291A1B1C1D1E1F28 /* Debug */,
 				A1234590291A1B1C1D1E1F29 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A123458C291A1B1C1D1E1FFC /* Build configuration list for PBXProject "ScrollCounter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A123458D291A1B1C1D1E1F26 /* Debug */,
+				A123458E291A1B1C1D1E1F27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -38,65 +38,75 @@ class ScrollDataManager: ObservableObject {
         checkAccessibilityPermission()
     }
     
-    // MARK: - アクセシビリティ権限要求
+    // MARK: - 権限チェック（スクロール追跡は権限不要）
     func requestAccessibilityPermission() async {
-        // 実際のアクセシビリティ権限は設定アプリで手動で有効化する必要があります
-        // ここでは権限状態のチェックのみ行います
-        checkAccessibilityPermission()
-        
-        if !hasAccessibilityPermission {
-            // ユーザーに設定画面への誘導を表示する処理を追加可能
-            print("アクセシビリティ権限が必要です。設定から有効化してください。")
-        }
+        // ScrollOffsetReaderを使用したスクロール検出では特別な権限は不要
+        hasAccessibilityPermission = true
+        print("スクロール追跡が利用可能です")
     }
     
     private func checkAccessibilityPermission() {
-        // iOSの制限により、アクセシビリティ権限の状態を直接取得することは困難
-        // 代替として、シミュレーション用の値を使用
-        hasAccessibilityPermission = true // デモ用
+        // ScrollView内でのスクロール検出は標準機能のため権限不要
+        hasAccessibilityPermission = true
     }
     
     // MARK: - モニタリング開始/停止
     func startMonitoring() {
-        guard hasAccessibilityPermission && !isMonitoring else { return }
+        guard !isMonitoring else { return }
         
         isMonitoring = true
         
-        // 5秒ごとにスクロールデータを更新（実際のアプリでは適切な間隔を設定）
-        monitoringTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
-            Task { @MainActor in
-                self.simulateScrollData() // 実際のアプリではアクセシビリティAPIからデータを取得
+        // スクロール追跡の通知を登録
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("ScrollDetected"),
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            if let userInfo = notification.userInfo,
+               let distance = userInfo["distance"] as? Double,
+               let appName = userInfo["appName"] as? String {
+                self?.recordScrollData(distance: distance, appName: appName)
             }
         }
+        
+        print("スクロール監視を開始しました")
     }
     
     func stopMonitoring() {
         guard isMonitoring else { return }
         isMonitoring = false
+        
+        // 通知オブザーバーを削除
+        NotificationCenter.default.removeObserver(
+            self,
+            name: NSNotification.Name("ScrollDetected"),
+            object: nil
+        )
+        
         monitoringTimer?.invalidate()
         monitoringTimer = nil
         saveCurrentData()
+        
+        print("スクロール監視を停止しました")
     }
     
-    // MARK: - デモ用スクロールデータシミュレーション
-    private func simulateScrollData() {
-        // デモ用のランダムスクロールデータ生成
-        let apps = ["Safari", "Twitter", "Instagram", "TikTok", "YouTube", "LINE", "Discord"]
-        let randomApp = apps.randomElement() ?? "Safari"
-        let randomDistance = Double.random(in: 10...100)
-        
-        currentSessionData[randomApp, default: 0] += randomDistance
+    // MARK: - スクロールデータ記録
+    private func recordScrollData(distance: Double, appName: String) {
+        // 現在のセッションデータを更新
+        currentSessionData[appName, default: 0] += distance
         
         // 今日の総距離を更新
-        todayTotalDistance += randomDistance
+        todayTotalDistance += distance
         
         // アプリ別ランキングを更新
         updateTopApps()
         
-        // 一定距離ごとにデータを保存
-        if Int(todayTotalDistance) % 500 == 0 {
+        // 一定距離ごとにデータを保存（100mごと）
+        if Int(todayTotalDistance) % 100 == 0 {
             saveCurrentData()
         }
+        
+        print("スクロール記録: \(appName) - \(distance)m (総距離: \(todayTotalDistance)m)")
     }
     
     // MARK: - アプリ別ランキング更新
@@ -217,7 +227,8 @@ class ScrollDataManager: ObservableObject {
     }
     
     deinit {
-        // TimerとCancellablesのクリーンアップのみ実行
+        // 通知オブザーバーとTimerのクリーンアップ
+        NotificationCenter.default.removeObserver(self)
         monitoringTimer?.invalidate()
         monitoringTimer = nil
         cancellables.removeAll()
