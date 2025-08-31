@@ -450,6 +450,7 @@ struct AppRankingRow: View {
 // MARK: - デジタルデトックス促進カード
 struct DigitalDetoxCard: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @State private var showingRestMode = false
     
     var conversionText: String {
         let distance = scrollDataManager.todayTotalDistance
@@ -529,18 +530,31 @@ struct DigitalDetoxCard: View {
                     endPoint: .bottomTrailing
                 ))
         )
+        .fullScreenCover(isPresented: $showingRestMode) {
+            DigitalRestModeView(
+                restDuration: getRecommendedRestDuration(),
+                isPresented: $showingRestMode
+            )
+        }
     }
     
     private func startDigitalDetox() {
         let distance = scrollDataManager.todayTotalDistance
         var detoxMessage = ""
+        var recommendedDuration = 5 // デフォルト5分
         
-        if distance >= 5000 {
-            detoxMessage = "⏰ 今日のスクロール量を見直し、30分間デバイスから離れませんか？\n🌿 散歩、読書、瞑想などをお試しください。"
+        if distance >= 10000 {
+            detoxMessage = "⚠️ 今日のスクロール量が10kmを超えています。\n30分間の本格的な休憩で目と体を回復させましょう。"
+            recommendedDuration = 30
+        } else if distance >= 5000 {
+            detoxMessage = "⏰ 今日のスクロール量を見直し、20分間画面から離れませんか？\n🌿 散歩、読書、瞑想などをお試しください。"
+            recommendedDuration = 20
         } else if distance >= 1000 {
-            detoxMessage = "📱 適度な休憩を取りましょう！\n👀 20-20-20ルール：20分ごとに20秒間、20フィート先を見る"
+            detoxMessage = "📱 適度な休憩を取りましょう！\n👀 10分間の休憩で20-20-20ルールを実践してみませんか？"
+            recommendedDuration = 10
         } else {
-            detoxMessage = "😊 良いペースです！この調子でバランスの取れたデジタルライフを続けましょう。"
+            detoxMessage = "😊 良いペースです！5分間の軽い休憩で、この調子をキープしましょう。"
+            recommendedDuration = 5
         }
         
         let alert = UIAlertController(
@@ -549,8 +563,8 @@ struct DigitalDetoxCard: View {
             preferredStyle: .alert
         )
         
-        alert.addAction(UIAlertAction(title: "休憩する", style: .default) { _ in
-            // デトックスタイマー開始（実装可能）
+        alert.addAction(UIAlertAction(title: "\(recommendedDuration)分休憩する", style: .default) { _ in
+            showingRestMode = true
         })
         
         alert.addAction(UIAlertAction(title: "後で", style: .cancel))
@@ -558,6 +572,21 @@ struct DigitalDetoxCard: View {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
             window.rootViewController?.present(alert, animated: true)
+        }
+    }
+    
+    // 推奨休憩時間を取得
+    private func getRecommendedRestDuration() -> Int {
+        let distance = scrollDataManager.todayTotalDistance
+        
+        if distance >= 10000 {
+            return 30
+        } else if distance >= 5000 {
+            return 20
+        } else if distance >= 1000 {
+            return 10
+        } else {
+            return 5
         }
     }
 }
