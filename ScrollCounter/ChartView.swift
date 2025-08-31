@@ -56,6 +56,7 @@ struct ChartView: View {
     
     // MARK: - スクロール検出シミュレーション
     private func simulateScrollDetection(appName: String, distance: Double) async {
+        print("📊 [ChartView] スクロール検出: \(appName) - \(distance)m")
         NotificationCenter.default.post(
             name: NSNotification.Name("ScrollDetected"),
             object: nil,
@@ -64,6 +65,7 @@ struct ChartView: View {
                 "appName": appName
             ]
         )
+        print("📤 [ChartView] 通知送信完了")
     }
     
     // MARK: - 時間範囲選択

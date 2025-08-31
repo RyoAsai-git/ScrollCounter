@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var autoScrollDetector: AutoScrollDetector
     @State private var showMotivationMessage = false
     
     var body: some View {
@@ -10,6 +11,9 @@ struct DashboardView: View {
                 VStack(spacing: 20) {
                     // 今日のスクロール距離カード
                     TotalDistanceCard()
+                    
+                    // 自動検出状況カード
+                    AutoDetectionStatusCard()
                     
                     // モチベーションメッセージ
                     if showMotivationMessage {
@@ -60,6 +64,7 @@ struct DashboardView: View {
     
     // MARK: - スクロール検出シミュレーション
     private func simulateScrollDetection(appName: String, distance: Double) async {
+        print("📱 [DashboardView] スクロール検出: \(appName) - \(distance)m")
         NotificationCenter.default.post(
             name: NSNotification.Name("ScrollDetected"),
             object: nil,
@@ -67,6 +72,81 @@ struct DashboardView: View {
                 "distance": distance,
                 "appName": appName
             ]
+        )
+        print("📤 [DashboardView] 通知送信完了")
+    }
+}
+
+// MARK: - 自動検出状況カード
+struct AutoDetectionStatusCard: View {
+    @EnvironmentObject var autoScrollDetector: AutoScrollDetector
+    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Image(systemName: "radar")
+                    .font(.title2)
+                    .foregroundColor(.green)
+                
+                Text("自動スクロール検出")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 8, height: 8)
+                    .opacity(0.8)
+            }
+            
+            HStack(spacing: 20) {
+                VStack(spacing: 4) {
+                    Text("検出済み距離")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("\(Int(autoScrollDetector.totalDetectedDistance))m")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.green)
+                }
+                
+                Divider()
+                    .frame(height: 30)
+                
+                VStack(spacing: 4) {
+                    Text("記録済み距離")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("\(Int(scrollDataManager.todayTotalDistance))m")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                }
+                
+                Divider()
+                    .frame(height: 30)
+                
+                VStack(spacing: 4) {
+                    Text("検出率")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Text("リアルタイム")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.orange)
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
         )
     }
 }
@@ -93,6 +173,9 @@ struct TotalDistanceCard: View {
                 Text(formatDistance(scrollDataManager.todayTotalDistance))
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
+                    .onAppear {
+                        print("🖼️ [TotalDistanceCard] 表示距離: \(scrollDataManager.todayTotalDistance)m")
+                    }
                 
                 Text("メートル")
                     .font(.title3)

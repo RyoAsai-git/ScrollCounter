@@ -33,9 +33,11 @@ class ScrollDataManager: ObservableObject {
     }
     
     init() {
+        print("🚀 [ScrollDataManager] 初期化開始")
         loadTodayData()
         loadWeeklyData()
         checkAccessibilityPermission()
+        print("📊 [ScrollDataManager] 初期化完了 - 今日の距離: \(todayTotalDistance)m")
     }
     
     // MARK: - 権限チェック（スクロール追跡は権限不要）
@@ -62,10 +64,14 @@ class ScrollDataManager: ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] notification in
+            print("🔔 [ScrollDataManager] 通知受信!")
             if let userInfo = notification.userInfo,
                let distance = userInfo["distance"] as? Double,
                let appName = userInfo["appName"] as? String {
+                print("📊 [ScrollDataManager] データ解析: \(appName) - \(distance)m")
                 self?.recordScrollData(distance: distance, appName: appName)
+            } else {
+                print("❌ [ScrollDataManager] 通知データが不正です")
             }
         }
         
@@ -106,7 +112,8 @@ class ScrollDataManager: ObservableObject {
             saveCurrentData()
         }
         
-        print("スクロール記録: \(appName) - \(distance)m (総距離: \(todayTotalDistance)m)")
+        print("✅ [ScrollDataManager] スクロール記録: \(appName) - \(distance)m (総距離: \(todayTotalDistance)m)")
+        print("📈 [ScrollDataManager] 現在のアプリ別データ: \(currentSessionData)")
     }
     
     // MARK: - アプリ別ランキング更新

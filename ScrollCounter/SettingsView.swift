@@ -53,6 +53,7 @@ struct SettingsView: View {
     
     // MARK: - スクロール検出シミュレーション
     private func simulateScrollDetection(appName: String, distance: Double) async {
+        print("⚙️ [SettingsView] スクロール検出: \(appName) - \(distance)m")
         NotificationCenter.default.post(
             name: NSNotification.Name("ScrollDetected"),
             object: nil,
@@ -61,6 +62,7 @@ struct SettingsView: View {
                 "appName": appName
             ]
         )
+        print("📤 [SettingsView] 通知送信完了")
     }
     
     // MARK: - アクセシビリティ設定セクション

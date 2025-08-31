@@ -4,6 +4,7 @@ struct ContentView: View {
     @State private var selectedTab = 0
     @StateObject private var scrollDataManager = ScrollDataManager()
     @StateObject private var notificationManager = NotificationManager()
+    @StateObject private var autoScrollDetector = AutoScrollDetector()
     
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -11,6 +12,7 @@ struct ContentView: View {
             DashboardView()
                 .environmentObject(scrollDataManager)
                 .environmentObject(notificationManager)
+                .environmentObject(autoScrollDetector)
                 .tabItem {
                     Image(systemName: "chart.bar.fill")
                     Text("ダッシュボード")
@@ -20,6 +22,7 @@ struct ContentView: View {
             // グラフ画面
             ChartView()
                 .environmentObject(scrollDataManager)
+                .environmentObject(autoScrollDetector)
                 .tabItem {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                     Text("履歴")
@@ -30,6 +33,7 @@ struct ContentView: View {
             SettingsView()
                 .environmentObject(scrollDataManager)
                 .environmentObject(notificationManager)
+                .environmentObject(autoScrollDetector)
                 .tabItem {
                     Image(systemName: "gearshape.fill")
                     Text("設定")
@@ -66,6 +70,7 @@ struct ContentView: View {
     
     // MARK: - スクロール検出シミュレーション
     private func simulateScrollDetection(appName: String, distance: Double) async {
+        print("🏠 [ContentView] スクロール検出: \(appName) - \(distance)m")
         NotificationCenter.default.post(
             name: NSNotification.Name("ScrollDetected"),
             object: nil,
@@ -74,6 +79,7 @@ struct ContentView: View {
                 "appName": appName
             ]
         )
+        print("📤 [ContentView] 通知送信完了")
     }
 }
 
