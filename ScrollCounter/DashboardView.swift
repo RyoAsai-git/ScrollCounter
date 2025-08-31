@@ -265,28 +265,76 @@ struct MotivationCard: View {
 // MARK: - アプリ別ランキングカード
 struct AppRankingCard: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @State private var showAllTime = false
+    
+    var currentApps: [AppScrollData] {
+        showAllTime ? scrollDataManager.allTimeTopApps : scrollDataManager.topApps
+    }
+    
+    var rankingTitle: String {
+        showAllTime ? "歴代ランキング" : "今日のランキング"
+    }
+    
+    var periodText: String {
+        if showAllTime {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.locale = Locale(identifier: "ja_JP")
+            let startDate = formatter.string(from: scrollDataManager.appStartDate)
+            let today = formatter.string(from: Date())
+            return "\(startDate) ～ \(today)"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.locale = Locale(identifier: "ja_JP")
+            return formatter.string(from: Date())
+        }
+    }
     
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
-                Image(systemName: "list.number")
-                    .font(.title2)
-                    .foregroundColor(.orange)
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: showAllTime ? "crown.fill" : "list.number")
+                        .font(.title2)
+                        .foregroundColor(showAllTime ? .yellow : .orange)
+                    
+                    Text(rankingTitle)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showAllTime.toggle()
+                        }
+                    }) {
+                        Text(showAllTime ? "今日" : "歴代")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(6)
+                    }
+                }
                 
-                Text("アプリ別ランキング")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                
-                Spacer()
+                HStack {
+                    Text("計測期間: \(periodText)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                }
             }
             
-            if scrollDataManager.topApps.isEmpty {
+            if currentApps.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "app.badge")
                         .font(.system(size: 40))
                         .foregroundColor(.gray)
                     
-                    Text("まだデータがありません")
+                    Text(showAllTime ? "まだ歴代データがありません" : "まだ今日のデータがありません")
                         .font(.body)
                         .foregroundColor(.secondary)
                     
@@ -298,12 +346,13 @@ struct AppRankingCard: View {
                 .padding(.vertical, 20)
             } else {
                 VStack(spacing: 12) {
-                    ForEach(Array(scrollDataManager.topApps.enumerated()), id: \.offset) { index, app in
+                    ForEach(Array(currentApps.enumerated()), id: \.offset) { index, app in
                         AppRankingRow(
                             rank: index + 1, 
                             appName: app.name, 
                             distance: app.distance,
-                            topAppDistance: scrollDataManager.topApps.first?.distance ?? 1
+                            topAppDistance: currentApps.first?.distance ?? 1,
+                            isAllTime: showAllTime
                         )
                     }
                 }
@@ -324,6 +373,7 @@ struct AppRankingRow: View {
     let appName: String
     let distance: Double
     let topAppDistance: Double
+    let isAllTime: Bool
     
     var rankEmoji: String {
         switch rank {
@@ -345,7 +395,7 @@ struct AppRankingRow: View {
                     .font(.body)
                     .fontWeight(.medium)
                 
-                Text("\(Int(distance))m スクロール")
+                Text("\(formatDistance(distance)) スクロール\(isAllTime ? " (累計)" : "")")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -361,11 +411,28 @@ struct AppRankingRow: View {
     }
     
     private var rankColor: Color {
-        switch rank {
-        case 1: return .yellow
-        case 2: return .gray
-        case 3: return .orange
-        default: return .blue
+        if isAllTime {
+            switch rank {
+            case 1: return .yellow
+            case 2: return .gray
+            case 3: return .orange
+            default: return .purple
+            }
+        } else {
+            switch rank {
+            case 1: return .yellow
+            case 2: return .gray
+            case 3: return .orange
+            default: return .blue
+            }
+        }
+    }
+    
+    private func formatDistance(_ distance: Double) -> String {
+        if distance >= 1000 {
+            return String(format: "%.1fkm", distance / 1000)
+        } else {
+            return "\(Int(distance))m"
         }
     }
 }

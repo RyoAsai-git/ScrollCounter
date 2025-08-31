@@ -15,9 +15,11 @@ class ScrollDataManager: ObservableObject {
     @Published var todayTotalDistance: Double = 0
     @Published var yesterdayTotalDistance: Double = 0
     @Published var topApps: [AppScrollData] = []
+    @Published var allTimeTopApps: [AppScrollData] = []
     @Published var weeklyData: [DailyScrollData] = []
     @Published var isMonitoring: Bool = false
     @Published var hasAccessibilityPermission: Bool = false
+    @Published var appStartDate: Date = Date()
     
     private var cancellables = Set<AnyCancellable>()
     private var monitoringTimer: Timer?
@@ -34,9 +36,11 @@ class ScrollDataManager: ObservableObject {
     
     init() {
         print("🚀 [ScrollDataManager] 初期化開始")
+        loadAppStartDate()
         loadHistoricalScrollData()
         loadTodayData()
         loadWeeklyData()
+        loadAllTimeTopApps()
         checkAccessibilityPermission()
         print("📊 [ScrollDataManager] 初期化完了 - 今日の距離: \(todayTotalDistance)m")
     }
@@ -197,6 +201,50 @@ class ScrollDataManager: ObservableObject {
         return Double.random(in: 1.2...2.0)
     }
     
+    // MARK: - アプリ開始日の管理
+    private func loadAppStartDate() {
+        let key = "AppFirstLaunchDate"
+        if let savedDate = UserDefaults.standard.object(forKey: key) as? Date {
+            appStartDate = savedDate
+            print("📅 [ScrollDataManager] アプリ開始日: \(formatDate(savedDate))")
+        } else {
+            // 初回起動
+            appStartDate = Date()
+            UserDefaults.standard.set(appStartDate, forKey: key)
+            print("🎉 [ScrollDataManager] 初回起動 - 開始日を記録: \(formatDate(appStartDate))")
+        }
+    }
+    
+    // MARK: - 歴代アプリ別ランキング
+    private func loadAllTimeTopApps() {
+        print("🏆 [ScrollDataManager] 歴代ランキング取得開始")
+        
+        let fetchRequest: NSFetchRequest<ScrollDataEntity> = ScrollDataEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "appName != nil")
+        
+        do {
+            let allAppData = try viewContext.fetch(fetchRequest)
+            
+            // アプリ別に累計距離を計算
+            var appTotals: [String: Double] = [:]
+            for entity in allAppData {
+                guard let appName = entity.appName else { continue }
+                appTotals[appName, default: 0] += entity.distance
+            }
+            
+            // 歴代ランキングを更新
+            allTimeTopApps = appTotals.map { AppScrollData(name: $0.key, distance: $0.value) }
+                .sorted { $0.distance > $1.distance }
+                .prefix(10) // 歴代は10位まで表示
+                .map { $0 }
+                
+            print("🏆 [ScrollDataManager] 歴代ランキング取得完了: \(allTimeTopApps.count)アプリ")
+            
+        } catch {
+            print("❌ [ScrollDataManager] 歴代ランキング取得エラー: \(error)")
+        }
+    }
+    
     // MARK: - アプリ別ランキング更新
     private func updateTopApps() {
         topApps = currentSessionData.map { AppScrollData(name: $0.key, distance: $0.value) }
@@ -243,6 +291,10 @@ class ScrollDataManager: ObservableObject {
             }
             
             try viewContext.save()
+            
+            // 歴代ランキングを更新
+            loadAllTimeTopApps()
+            
         } catch {
             print("データ保存エラー: \(error)")
         }
@@ -312,6 +364,14 @@ class ScrollDataManager: ObservableObject {
     func refreshData() async {
         loadTodayData()
         loadWeeklyData()
+    }
+    
+    // MARK: - ヘルパー関数
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "ja_JP")
+        return formatter.string(from: date)
     }
     
     deinit {
