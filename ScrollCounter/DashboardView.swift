@@ -11,8 +11,8 @@ struct DashboardView: View {
                     // 今日のスクロール距離カード
                     TotalDistanceCard()
                     
-                    // 自動検出状況カード
-                    AutoDetectionStatusCard()
+                    // スクロール検出状況カード
+                    ScrollDetectionStatusCard()
                     
                     // モチベーションメッセージ
                     if showMotivationMessage {
@@ -76,46 +76,46 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - 自動検出状況カード
-struct AutoDetectionStatusCard: View {
+// MARK: - スクロール検出状況カード
+struct ScrollDetectionStatusCard: View {
     @EnvironmentObject var scrollDataManager: ScrollDataManager
     
     var body: some View {
         VStack(spacing: 16) {
             HStack {
-                Image(systemName: "radar")
+                Image(systemName: "touchid")
                     .font(.title2)
-                    .foregroundColor(.green)
+                    .foregroundColor(.blue)
                 
-                Text("自動スクロール検出")
+                Text("スクロール検出状況")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 Spacer()
                 
                 Circle()
-                    .fill(Color.green)
+                    .fill(scrollDataManager.isMonitoring ? Color.green : Color.red)
                     .frame(width: 8, height: 8)
                     .opacity(0.8)
             }
             
             HStack(spacing: 20) {
                 VStack(spacing: 4) {
-                    Text("自動検出済み")
+                    Text("検出状態")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("\(Int(scrollDataManager.autoDetectedDistance))m")
+                    Text(scrollDataManager.isMonitoring ? "監視中" : "停止中")
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(.green)
+                        .foregroundColor(scrollDataManager.isMonitoring ? .green : .red)
                 }
                 
                 Divider()
                     .frame(height: 30)
                 
                 VStack(spacing: 4) {
-                    Text("記録済み距離")
+                    Text("今日の記録")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
@@ -129,12 +129,12 @@ struct AutoDetectionStatusCard: View {
                     .frame(height: 30)
                 
                 VStack(spacing: 4) {
-                    Text("検出率")
+                    Text("アプリ数")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("リアルタイム")
-                        .font(.caption)
+                    Text("\(scrollDataManager.topApps.count)")
+                        .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.orange)
                 }
