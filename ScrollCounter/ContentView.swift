@@ -37,9 +37,9 @@ struct ContentView: View {
                 .tag(2)
         }
         .accentColor(.blue)
-        .onChange(of: selectedTab) { newTab in
+        .onChange(of: selectedTab) { _, newValue in
             // タブ切り替え時にスクロール検出をシミュレート
-            let tabName = ["ダッシュボード", "履歴", "設定"][newTab]
+            let tabName = ["ダッシュボード", "履歴", "設定"][newValue]
             Task {
                 await simulateScrollDetection(appName: "タブ切り替え", distance: 15.0)
             }

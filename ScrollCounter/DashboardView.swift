@@ -38,7 +38,7 @@ struct DashboardView: View {
                 // スクロール検出：プルリフレッシュ時にスクロール距離を記録
                 await simulateScrollDetection(appName: "ダッシュボード", distance: 50.0)
                 
-                await scrollDataManager.refreshData()
+                await usageDataManager.refreshData()
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showMotivationMessage = true
                 }
@@ -51,12 +51,12 @@ struct DashboardView: View {
                 }
             }
         }
-        .environmentObject(scrollDataManager)
+        .environmentObject(usageDataManager)
         .onAppear {
             // 画面表示時にスクロール検出とデータ更新
             Task {
                 await simulateScrollDetection(appName: "ダッシュボード", distance: 30.0)
-                await scrollDataManager.refreshData()
+                await usageDataManager.refreshData()
             }
         }
     }
@@ -87,14 +87,14 @@ struct UsageMonitoringCard: View {
                     .font(.title2)
                     .foregroundColor(.blue)
                 
-                Text("スクロール検出状況")
+                Text("使用時間監視状況")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
                 Spacer()
                 
                 Circle()
-                    .fill(scrollDataManager.isMonitoring ? Color.green : Color.red)
+                    .fill(usageDataManager.isMonitoring ? Color.green : Color.red)
                     .frame(width: 8, height: 8)
                     .opacity(0.8)
             }
@@ -105,10 +105,10 @@ struct UsageMonitoringCard: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text(scrollDataManager.isMonitoring ? "監視中" : "停止中")
+                    Text(usageDataManager.isMonitoring ? "監視中" : "停止中")
                         .font(.title3)
                         .fontWeight(.semibold)
-                        .foregroundColor(scrollDataManager.isMonitoring ? .green : .red)
+                        .foregroundColor(usageDataManager.isMonitoring ? .green : .red)
                 }
                 
                 Divider()
@@ -119,7 +119,7 @@ struct UsageMonitoringCard: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("\(Int(scrollDataManager.todayTotalDistance))m")
+                                            Text(usageDataManager.formatDuration(usageDataManager.todayTotalDuration))
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.blue)
@@ -180,20 +180,20 @@ struct TotalUsageCard: View {
                     .foregroundColor(.secondary)
             }
             
-            // プログレスバー（1日10km目標）
+            // プログレスバー（1日4時間注意ライン）
             VStack(spacing: 8) {
                 HStack {
-                    Text("今日の進捗")
+                    Text("今日の使用状況")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("\(Int((scrollDataManager.todayTotalDistance / 10000) * 100))%")
+                    Text("\(Int((usageDataManager.todayTotalDuration / 14400) * 100))%")
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundColor(.blue)
                 }
                 
-                ProgressView(value: min(scrollDataManager.todayTotalDistance / 10000, 1.0))
+                ProgressView(value: min(usageDataManager.todayTotalDuration / 14400, 1.0))
                     .progressViewStyle(LinearProgressViewStyle(tint: .blue))
                     .scaleEffect(y: 2)
             }
@@ -291,7 +291,7 @@ struct AppRankingCard: View {
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
             formatter.locale = Locale(identifier: "ja_JP")
-            let startDate = formatter.string(from: scrollDataManager.appStartDate)
+            let startDate = formatter.string(from: usageDataManager.appStartDate)
             let today = formatter.string(from: Date())
             return "\(startDate) ～ \(today)"
         } else {
@@ -361,8 +361,8 @@ struct AppRankingCard: View {
                         AppRankingRow(
                             rank: index + 1, 
                             appName: app.name, 
-                            distance: app.distance,
-                            topAppDistance: currentApps.first?.distance ?? 1,
+                                                            distance: app.duration,
+                                topAppDistance: currentApps.first?.duration ?? 1,
                             isAllTime: showAllTime
                         )
                     }
@@ -454,7 +454,7 @@ struct DigitalDetoxCard: View {
     @State private var showingRestMode = false
     
     var conversionText: String {
-        let distance = scrollDataManager.todayTotalDistance
+                    let duration = usageDataManager.todayTotalDuration
         
         if distance >= 42195 {
             return "⚠️ フルマラソン分もスクロール...指の疲労が心配です"
@@ -540,7 +540,7 @@ struct DigitalDetoxCard: View {
     }
     
     private func startDigitalDetox() {
-        let distance = scrollDataManager.todayTotalDistance
+                    let duration = usageDataManager.todayTotalDuration
         var detoxMessage = ""
         var recommendedDuration = 5 // デフォルト5分
         
@@ -578,7 +578,7 @@ struct DigitalDetoxCard: View {
     
     // 推奨休憩時間を取得
     private func getRecommendedRestDuration() -> Int {
-        let distance = scrollDataManager.todayTotalDistance
+                    let duration = usageDataManager.todayTotalDuration
         
         if distance >= 10000 {
             return 30
