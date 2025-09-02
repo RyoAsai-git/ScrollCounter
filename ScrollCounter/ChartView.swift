@@ -3,7 +3,7 @@ import Charts
 
 struct ChartView: View {
     @EnvironmentObject var usageDataManager: UsageDataManager
-    @State private var selectedDataPoint: DailyScrollData?
+    @State private var selectedDataPoint: DailyUsageData?
     @State private var selectedTimeRange: TimeRange = .week
     
     enum TimeRange: String, CaseIterable {
@@ -37,7 +37,7 @@ struct ChartView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
-            .navigationTitle("スクロール履歴")
+            .navigationTitle("使用時間履歴")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 // スクロール検出：プルリフレッシュ時にスクロール距離を記録
@@ -89,7 +89,7 @@ struct ChartView: View {
                     .font(.title2)
                     .foregroundColor(.blue)
                 
-                Text("スクロール距離の推移")
+                Text("使用時間の推移")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -136,7 +136,7 @@ struct ChartView: View {
         Chart(usageDataManager.weeklyData) { data in
             BarMark(
                 x: .value("日付", data.date, unit: .day),
-                y: .value("距離", data.totalDistance)
+                y: .value("使用時間", data.totalDuration)
             )
             .foregroundStyle(LinearGradient(
                 gradient: Gradient(colors: [.blue.opacity(0.8), .purple.opacity(0.6)]),
@@ -165,7 +165,7 @@ struct ChartView: View {
                 AxisGridLine()
                 AxisValueLabel {
                     if let doubleValue = value.as(Double.self) {
-                        Text(formatDistance(doubleValue))
+                        Text(usageDataManager.formatDuration(doubleValue))
                     }
                 }
             }
@@ -185,13 +185,13 @@ struct ChartView: View {
     
     // MARK: - 選択されたデータの表示
     @ViewBuilder
-    private func SelectedDataView(data: DailyScrollData) -> some View {
+    private func SelectedDataView(data: DailyUsageData) -> some View {
         VStack(spacing: 8) {
             Text(formatDate(data.date))
                 .font(.caption)
                 .foregroundColor(.secondary)
             
-            Text(formatDistance(data.totalDistance))
+            Text(usageDataManager.formatDuration(data.totalDuration))
                 .font(.title2)
                 .fontWeight(.semibold)
                 .foregroundColor(.blue)
@@ -226,19 +226,19 @@ struct ChartView: View {
             HStack(spacing: 20) {
                 StatisticItem(
                     title: "平均",
-                    value: formatDistance(weeklyAverage),
+                    value: usageDataManager.formatDuration(weeklyAverage),
                     color: .blue
                 )
                 
                 StatisticItem(
                     title: "最高",
-                    value: formatDistance(weeklyMax),
+                    value: usageDataManager.formatDuration(weeklyMax),
                     color: .green
                 )
                 
                 StatisticItem(
                     title: "合計",
-                    value: formatDistance(weeklyTotal),
+                    value: usageDataManager.formatDuration(weeklyTotal),
                     color: .purple
                 )
             }
@@ -307,18 +307,18 @@ struct ChartView: View {
 
     
     // MARK: - 計算プロパティ
-    private var weeklyAverage: Double {
+    private var weeklyAverage: TimeInterval {
         guard !usageDataManager.weeklyData.isEmpty else { return 0 }
-        let total = usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
+        let total = usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDuration }
         return total / Double(usageDataManager.weeklyData.count)
     }
     
-    private var weeklyMax: Double {
-        usageDataManager.weeklyData.map(\.totalDistance).max() ?? 0
+    private var weeklyMax: TimeInterval {
+        usageDataManager.weeklyData.map(\.totalDuration).max() ?? 0
     }
     
-    private var weeklyTotal: Double {
-        usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
+    private var weeklyTotal: TimeInterval {
+        usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDuration }
     }
     
     private var trendMessage: String {
@@ -327,39 +327,35 @@ struct ChartView: View {
         }
         
         let recent = Array(usageDataManager.weeklyData.suffix(3))
-        let recentAverage = recent.reduce(0) { $0 + $1.totalDistance } / Double(recent.count)
+        let recentAverage = recent.reduce(0) { $0 + $1.totalDuration } / Double(recent.count)
         
         let earlier = Array(usageDataManager.weeklyData.prefix(3))
-        let earlierAverage = earlier.reduce(0) { $0 + $1.totalDistance } / Double(earlier.count)
+        let earlierAverage = earlier.reduce(0) { $0 + $1.totalDuration } / Double(earlier.count)
         
         if recentAverage > earlierAverage * 1.2 {
-            return "📈 スクロール量が増加傾向にあります"
+            return "📈 使用時間が増加傾向にあります"
         } else if recentAverage < earlierAverage * 0.8 {
-            return "📉 スクロール量が減少傾向にあります"
+            return "📉 使用時間が減少傾向にあります"
         } else {
-            return "📊 スクロール量は安定しています"
+            return "📊 使用時間は安定しています"
         }
     }
     
     private var trendAdvice: String {
         let average = weeklyAverage
         
-        if average > 8000 {
-            return "スクロール量が多めです。適度な休憩を取ることをお勧めします。"
-        } else if average > 5000 {
-            return "標準的なスクロール量です。このペースを維持しましょう。"
+        if average > 14400 { // 4時間以上
+            return "使用時間が多めです。適度な休憩を取ることをお勧めします。"
+        } else if average > 7200 { // 2時間以上
+            return "標準的な使用時間です。このペースを維持しましょう。"
         } else {
-            return "スクロール量は控えめです。デジタルデトックスが上手くいっています！"
+            return "使用時間は控えめです。デジタルデトックスが上手くいっています！"
         }
     }
     
-    // MARK: - ヘルパー関数
+    // MARK: - ヘルパー関数（互換性のため残存）
     private func formatDistance(_ distance: Double) -> String {
-        if distance >= 1000 {
-            return String(format: "%.1fkm", distance / 1000)
-        } else {
-            return "\(Int(distance))m"
-        }
+        return usageDataManager.formatDuration(distance)
     }
     
     private func formatDate(_ date: Date) -> String {
@@ -373,7 +369,7 @@ struct ChartView: View {
 struct ChartView_Previews: PreviewProvider {
     static var previews: some View {
         ChartView()
-            .environmentObject(ScrollDataManager())
+            .environmentObject(UsageDataManager())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

@@ -47,19 +47,19 @@ struct ContentView: View {
         .onAppear {
             // アプリ起動時の初期化処理
             Task {
-                await scrollDataManager.requestAccessibilityPermission()
+                await usageDataManager.requestAccessibilityPermission()
                 await notificationManager.requestNotificationPermission()
-                scrollDataManager.startMonitoring()
+                usageDataManager.startMonitoring()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
             // アプリがバックグラウンドに移行する時の処理
-            scrollDataManager.saveCurrentData()
+            usageDataManager.saveCurrentData()
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             // アプリがフォアグラウンドに復帰する時の処理
             Task {
-                await scrollDataManager.refreshData()
+                await usageDataManager.refreshData()
             }
         }
     }
