@@ -355,7 +355,7 @@ struct ChartView: View {
     
     // MARK: - ヘルパー関数（互換性のため残存）
     private func formatDistance(_ distance: Double) -> String {
-        return usageDataManager.formatDuration(distance)
+        return UsageDataManager.formatDuration(distance)
     }
     
     private func formatDate(_ date: Date) -> String {

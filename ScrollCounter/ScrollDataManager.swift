@@ -90,6 +90,31 @@ class UsageDataManager: ObservableObject {
         }
     }
     
+    // MARK: - 静的フォーマット関数（スコープエラー防止用）
+    static func formatDuration(_ duration: TimeInterval) -> String {
+        let hours = Int(duration) / 3600
+        let minutes = Int(duration) % 3600 / 60
+        
+        if hours > 0 {
+            return "\(hours)時間\(minutes)分"
+        } else if minutes > 0 {
+            return "\(minutes)分"
+        } else {
+            return "1分未満"
+        }
+    }
+    
+    static func formatDurationShort(_ duration: TimeInterval) -> String {
+        let hours = Int(duration) / 3600
+        let minutes = Int(duration) % 3600 / 60
+        
+        if hours > 0 {
+            return "\(hours)h\(minutes)m"
+        } else {
+            return "\(minutes)m"
+        }
+    }
+    
     // 互換性のための古いメソッド名
     func formatDistance(_ duration: TimeInterval) -> String {
         return formatDuration(duration)

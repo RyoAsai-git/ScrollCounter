@@ -406,7 +406,7 @@ struct AppRankingRow: View {
                     .font(.body)
                     .fontWeight(.medium)
                 
-                Text("\(usageDataManager.formatDuration(distance)) 使用\(isAllTime ? " (累計)" : "")")
+                Text("\(UsageDataManager.formatDuration(distance)) 使用\(isAllTime ? " (累計)" : "")")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
