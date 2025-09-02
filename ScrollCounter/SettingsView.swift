@@ -28,10 +28,7 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
-            // 画面表示時に使用時間更新
-            Task {
-                await simulateUsageUpdate(appName: "設定", duration: 45.0)
-            }
+            // 画面表示時の処理
         }
         .alert("アクセシビリティ設定", isPresented: $showingAccessibilityAlert) {
             Button("設定を開く") {
@@ -49,20 +46,6 @@ struct SettingsView: View {
         } message: {
             Text("通知を受け取るには、設定アプリで通知権限を有効にしてください。")
         }
-    }
-    
-    // MARK: - 使用時間更新シミュレーション
-    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
-        print("⚙️ [SettingsView] 使用時間更新: \(appName) - \(Int(duration))秒")
-        NotificationCenter.default.post(
-            name: NSNotification.Name("UsageUpdated"),
-            object: nil,
-            userInfo: [
-                "duration": duration,
-                "appName": appName
-            ]
-        )
-        print("📤 [SettingsView] 通知送信完了")
     }
     
     // MARK: - アクセシビリティ設定セクション
@@ -413,7 +396,7 @@ struct ExcludedAppsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
-            .environmentObject(ScrollDataManager())
+            .environmentObject(UsageDataManager())
             .environmentObject(NotificationManager())
     }
 }

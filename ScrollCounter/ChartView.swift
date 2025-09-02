@@ -40,32 +40,17 @@ struct ChartView: View {
             .navigationTitle("使用時間履歴")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
-                // 使用時間更新：プルリフレッシュ時に使用時間を記録
-                await simulateUsageUpdate(appName: "履歴", duration: 80.0)
+                // データ更新
                 await usageDataManager.refreshData()
             }
         }
         .environmentObject(usageDataManager)
         .onAppear {
-            // 画面表示時に使用時間更新
+            // 画面表示時にデータ更新
             Task {
-                await simulateUsageUpdate(appName: "履歴", duration: 60.0)
+                await usageDataManager.refreshData()
             }
         }
-    }
-    
-    // MARK: - 使用時間更新シミュレーション
-    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
-        print("📊 [ChartView] 使用時間更新: \(appName) - \(Int(duration))秒")
-        NotificationCenter.default.post(
-            name: NSNotification.Name("UsageUpdated"),
-            object: nil,
-            userInfo: [
-                "duration": duration,
-                "appName": appName
-            ]
-        )
-        print("📤 [ChartView] 通知送信完了")
     }
     
     // MARK: - 時間範囲選択

@@ -38,9 +38,7 @@ struct DashboardView: View {
             .navigationTitle("使用時間")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
-                // 使用時間更新：プルリフレッシュ時に使用時間を記録
-                await simulateUsageUpdate(appName: "ダッシュボード", duration: 120.0)
-                
+                // データ更新
                 await usageDataManager.refreshData()
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                     showMotivationMessage = true
@@ -56,26 +54,11 @@ struct DashboardView: View {
         }
         .environmentObject(usageDataManager)
         .onAppear {
-            // 画面表示時に使用時間更新とデータ更新
+            // 画面表示時にデータ更新
             Task {
-                await simulateUsageUpdate(appName: "ダッシュボード", duration: 90.0)
                 await usageDataManager.refreshData()
             }
         }
-    }
-    
-    // MARK: - 使用時間更新シミュレーション
-    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
-        print("📱 [DashboardView] 使用時間更新: \(appName) - \(Int(duration))秒")
-        NotificationCenter.default.post(
-            name: NSNotification.Name("UsageUpdated"),
-            object: nil,
-            userInfo: [
-                "duration": duration,
-                "appName": appName
-            ]
-        )
-        print("📤 [DashboardView] 通知送信完了")
     }
 }
 

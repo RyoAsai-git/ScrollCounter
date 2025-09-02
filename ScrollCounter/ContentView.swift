@@ -38,11 +38,7 @@ struct ContentView: View {
         }
         .accentColor(.blue)
         .onChange(of: selectedTab) { _, newValue in
-            // タブ切り替え時に使用時間更新をシミュレート
-            let tabName = ["ダッシュボード", "履歴", "設定"][newValue]
-            Task {
-                await simulateUsageUpdate(appName: "タブ切り替え", duration: 30.0)
-            }
+            // タブ切り替え時の処理（必要に応じて追加）
         }
         .onAppear {
             // アプリ起動時の初期化処理
@@ -62,20 +58,6 @@ struct ContentView: View {
                 await usageDataManager.refreshData()
             }
         }
-    }
-    
-    // MARK: - 使用時間更新シミュレーション
-    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
-        print("🏠 [ContentView] 使用時間更新: \(appName) - \(Int(duration))秒")
-        NotificationCenter.default.post(
-            name: NSNotification.Name("UsageUpdated"),
-            object: nil,
-            userInfo: [
-                "duration": duration,
-                "appName": appName
-            ]
-        )
-        print("📤 [ContentView] 通知送信完了")
     }
 }
 

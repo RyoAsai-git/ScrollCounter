@@ -46,7 +46,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>スクロールチェッカー</string>
+	<string>ScrollCounter</string>
 	<key>CFBundleName</key>
 	<string>ScrollCounter</string>
 	<key>CFBundleIdentifier</key>
@@ -61,5 +61,7 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>NSFamilyControlsUsageDescription</key>
+	<string>このアプリは、あなたのデバイス使用時間を正確に表示し、デジタルデトックスをサポートするために、Screen Timeデータへのアクセスが必要です。</string>
 </dict>
 </plist>

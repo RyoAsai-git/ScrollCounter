@@ -4,11 +4,23 @@ import CoreData
 @main
 struct ScrollCounterApp: App {
     let persistenceController = PersistenceController.shared
+    @State private var isActive = false
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            if isActive {
+                ContentView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            } else {
+                SplashView(isActive: $isActive)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            withAnimation(.easeInOut(duration: 0.4)) {
+                                isActive = true
+                            }
+                        }
+                    }
+            }
         }
     }
 }
