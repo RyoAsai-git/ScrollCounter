@@ -608,68 +608,80 @@ struct DigitalRestModeView: View {
     }
     
     var body: some View {
-        ZStack {
-            // 暗い背景（画面を暗くする効果）
-            Color.black
-                .ignoresSafeArea(.all)
-            
-            VStack(spacing: 30) {
-                Spacer()
+        GeometryReader { geometry in
+            ZStack {
+                // 暗い背景（画面を暗くする効果）
+                Color.black
+                    .ignoresSafeArea(.all)
                 
-                // デトックスアイコン
-                Image(systemName: "leaf.fill")
-                    .font(.system(size: 80))
-                    .foregroundColor(.green)
-                    .shadow(color: .green, radius: 10)
-                
-                // タイトル
-                Text("デジタル休憩中")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                // 残り時間表示
-                Text(formatTime(timeRemaining))
-                    .font(.system(size: 48, weight: .light, design: .monospaced))
-                    .foregroundColor(.green)
-                    .shadow(color: .green, radius: 5)
-                
-                // 休憩メッセージ
-                VStack(spacing: 15) {
-                    Text("目を休めて、深呼吸をしましょう")
-                        .font(.headline)
-                        .foregroundColor(.white.opacity(0.9))
-                        .multilineTextAlignment(.center)
-                    
-                    Text("👀 遠くを見つめる\n🧘‍♀️ 軽いストレッチ\n💧 水分補給")
-                        .font(.body)
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(5)
-                }
-                .padding(.horizontal, 40)
-                
-                Spacer()
-                
-                // 早期終了ボタン
-                VStack(spacing: 15) {
-                    Button("休憩を終了") {
-                        endRestMode()
+                ScrollView {
+                    VStack(spacing: min(25, geometry.size.height * 0.04)) {
+                        // 上部のスペース
+                        Spacer()
+                            .frame(height: max(20, geometry.safeAreaInsets.top + 20))
+                        
+                        // デトックスアイコン - サイズを画面に応じて調整
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: min(60, geometry.size.height * 0.08)))
+                            .foregroundColor(.green)
+                            .shadow(color: .green, radius: 8)
+                        
+                        // タイトル
+                        Text("デジタル休憩中")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        // 残り時間表示 - サイズを画面に応じて調整
+                        Text(formatTime(timeRemaining))
+                            .font(.system(size: min(40, geometry.size.width * 0.12), weight: .light, design: .monospaced))
+                            .foregroundColor(.green)
+                            .shadow(color: .green, radius: 5)
+                        
+                        // 休憩メッセージ
+                        VStack(spacing: 12) {
+                            Text("目を休めて、深呼吸をしましょう")
+                                .font(.headline)
+                                .foregroundColor(.white.opacity(0.9))
+                                .multilineTextAlignment(.center)
+                            
+                            Text("👀 遠くを見つめる\n🧘‍♀️ 軽いストレッチ\n💧 水分補給")
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .lineSpacing(5)
+                        }
+                        .padding(.horizontal, 30)
+                        
+                        // 中央のスペース
+                        Spacer()
+                            .frame(height: min(40, geometry.size.height * 0.05))
+                        
+                        // 早期終了ボタン - Safe Area を考慮
+                        VStack(spacing: 12) {
+                            Button("休憩を終了") {
+                                endRestMode()
+                            }
+                            .font(.headline)
+                            .foregroundColor(.orange)
+                            .padding(.horizontal, 25)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .stroke(Color.orange, lineWidth: 2)
+                            )
+                            
+                            Text("推奨休憩時間: \(restDuration)分")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.5))
+                        }
+                        
+                        // 下部のスペース
+                        Spacer()
+                            .frame(height: max(30, geometry.safeAreaInsets.bottom + 30))
                     }
-                    .font(.headline)
-                    .foregroundColor(.orange)
-                    .padding(.horizontal, 30)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 25)
-                            .stroke(Color.orange, lineWidth: 2)
-                    )
-                    
-                    Text("推奨休憩時間: \(restDuration)分")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.5))
+                    .frame(minHeight: geometry.size.height)
                 }
-                .padding(.bottom, 50)
             }
         }
         .onAppear {
@@ -876,133 +888,140 @@ struct DetoxTimerModeView: View {
     }
     
     var body: some View {
-        ZStack {
-            // 背景グラデーション
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.green.opacity(0.3),
-                    Color.mint.opacity(0.2),
-                    Color.blue.opacity(0.1)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            
-            VStack(spacing: 40) {
-                // ヘッダー
-                VStack(spacing: 16) {
-                    Image(systemName: "leaf.circle.fill")
-                        .font(.system(size: 80))
-                        .foregroundColor(.green)
-                    
-                    Text("デジタルデトックス中")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                    
-                    Text("心と体をリフレッシュする時間です")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
+        GeometryReader { geometry in
+            ZStack {
+                // 背景グラデーション
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.green.opacity(0.3),
+                        Color.mint.opacity(0.2),
+                        Color.blue.opacity(0.1)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
                 
-                // タイマー表示
-                VStack(spacing: 24) {
-                    ZStack {
-                        Circle()
-                            .stroke(Color.green.opacity(0.3), lineWidth: 8)
-                            .frame(width: 200, height: 200)
-                        
-                        Circle()
-                            .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(duration))
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [.green, .mint]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                            )
-                            .rotationEffect(.degrees(-90))
-                            .frame(width: 200, height: 200)
-                            .animation(.linear(duration: 1), value: timeRemaining)
-                        
-                        VStack(spacing: 4) {
-                            Text(formatTime(timeRemaining))
-                                .font(.system(size: 36, weight: .bold, design: .monospaced))
+                ScrollView {
+                    VStack(spacing: min(30, geometry.size.height * 0.04)) {
+                        // ヘッダー - サイズを画面に応じて調整
+                        VStack(spacing: 12) {
+                            Image(systemName: "leaf.circle.fill")
+                                .font(.system(size: min(60, geometry.size.height * 0.08)))
+                                .foregroundColor(.green)
+                            
+                            Text("デジタルデトックス中")
+                                .font(.title)
+                                .fontWeight(.bold)
                                 .foregroundColor(.primary)
                             
-                            Text("残り時間")
-                                .font(.caption)
+                            Text("心と体をリフレッシュする時間です")
+                                .font(.body)
                                 .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
                         }
-                    }
-                    
-                    // 進捗情報
-                    VStack(spacing: 8) {
-                        Text("進捗: \(Int((1 - Double(timeRemaining) / Double(duration)) * 100))%")
-                            .font(.headline)
-                            .foregroundColor(.green)
+                        .padding(.top, 10)
                         
-                        ProgressView(value: 1 - Double(timeRemaining) / Double(duration))
-                            .progressViewStyle(LinearProgressViewStyle(tint: .green))
-                            .frame(width: 200)
-                    }
-                }
-                
-                // 推奨活動
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("おすすめの過ごし方")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                        RecommendationItem(icon: "figure.walk", text: "散歩する")
-                        RecommendationItem(icon: "book", text: "読書する")
-                        RecommendationItem(icon: "leaf", text: "瞑想する")
-                        RecommendationItem(icon: "cup.and.saucer", text: "お茶を飲む")
-                        RecommendationItem(icon: "music.note", text: "音楽を聴く")
-                        RecommendationItem(icon: "bed.double", text: "休憩する")
-                    }
-                }
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                // 制御ボタン
-                HStack(spacing: 20) {
-                    Button(action: {
-                        pauseResumeTimer()
-                    }) {
-                        HStack {
-                            Image(systemName: isActive ? "pause.circle" : "play.circle")
-                            Text(isActive ? "一時停止" : "再開")
+                        // タイマー表示 - サイズを画面に応じて調整
+                        VStack(spacing: 20) {
+                            let circleSize = min(180, geometry.size.width * 0.45)
+                            ZStack {
+                                Circle()
+                                    .stroke(Color.green.opacity(0.3), lineWidth: 6)
+                                    .frame(width: circleSize, height: circleSize)
+                                
+                                Circle()
+                                    .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(duration))
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [.green, .mint]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                                    )
+                                    .rotationEffect(.degrees(-90))
+                                    .frame(width: circleSize, height: circleSize)
+                                    .animation(.linear(duration: 1), value: timeRemaining)
+                                
+                                VStack(spacing: 4) {
+                                    Text(formatTime(timeRemaining))
+                                        .font(.system(size: min(32, geometry.size.width * 0.08), weight: .bold, design: .monospaced))
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("残り時間")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            // 進捗情報
+                            VStack(spacing: 6) {
+                                Text("進捗: \(Int((1 - Double(timeRemaining) / Double(duration)) * 100))%")
+                                    .font(.subheadline)
+                                    .foregroundColor(.green)
+                                
+                                ProgressView(value: 1 - Double(timeRemaining) / Double(duration))
+                                    .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                                    .frame(width: min(180, geometry.size.width * 0.45))
+                            }
                         }
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(25)
-                    }
-                    
-                    Button(action: {
-                        stopTimer()
-                    }) {
-                        HStack {
-                            Image(systemName: "stop.circle")
-                            Text("終了")
+                        
+                        // 推奨活動 - コンパクトに表示
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("おすすめの過ごし方")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 10) {
+                                RecommendationItem(icon: "figure.walk", text: "散歩する")
+                                RecommendationItem(icon: "book", text: "読書する")
+                                RecommendationItem(icon: "leaf", text: "瞑想する")
+                                RecommendationItem(icon: "cup.and.saucer", text: "お茶を飲む")
+                                RecommendationItem(icon: "music.note", text: "音楽を聴く")
+                                RecommendationItem(icon: "bed.double", text: "休憩する")
+                            }
                         }
-                        .foregroundColor(.red)
                         .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(25)
+                        
+                        // 制御ボタン - 画面下部に固定せず、スクロール可能領域に配置
+                        HStack(spacing: 15) {
+                            Button(action: {
+                                pauseResumeTimer()
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: isActive ? "pause.circle" : "play.circle")
+                                    Text(isActive ? "一時停止" : "再開")
+                                }
+                                .font(.body)
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(20)
+                            }
+                            
+                            Button(action: {
+                                stopTimer()
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "stop.circle")
+                                    Text("終了")
+                                }
+                                .font(.body)
+                                .foregroundColor(.red)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(20)
+                            }
+                        }
+                        .padding(.bottom, 20)
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 40)
         }
         .onAppear {
             setupTimer()
