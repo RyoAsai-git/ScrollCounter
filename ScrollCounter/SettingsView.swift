@@ -28,9 +28,9 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
-            // 画面表示時にスクロール検出
+            // 画面表示時に使用時間更新
             Task {
-                await simulateScrollDetection(appName: "設定", distance: 20.0)
+                await simulateUsageUpdate(appName: "設定", duration: 45.0)
             }
         }
         .alert("アクセシビリティ設定", isPresented: $showingAccessibilityAlert) {
@@ -39,7 +39,7 @@ struct SettingsView: View {
             }
             Button("キャンセル", role: .cancel) { }
         } message: {
-            Text("スクロール距離を計測するには、設定アプリでアクセシビリティ権限を有効にしてください。")
+            Text("使用時間を計測するには、設定アプリでScreen Time権限を有効にしてください。")
         }
         .alert("通知設定", isPresented: $showingNotificationAlert) {
             Button("設定を開く") {
@@ -51,14 +51,14 @@ struct SettingsView: View {
         }
     }
     
-    // MARK: - スクロール検出シミュレーション
-    private func simulateScrollDetection(appName: String, distance: Double) async {
-        print("⚙️ [SettingsView] スクロール検出: \(appName) - \(distance)m")
+    // MARK: - 使用時間更新シミュレーション
+    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
+        print("⚙️ [SettingsView] 使用時間更新: \(appName) - \(Int(duration))秒")
         NotificationCenter.default.post(
-            name: NSNotification.Name("ScrollDetected"),
+            name: NSNotification.Name("UsageUpdated"),
             object: nil,
             userInfo: [
-                "distance": distance,
+                "duration": duration,
                 "appName": appName
             ]
         )
@@ -98,7 +98,7 @@ struct SettingsView: View {
                     .foregroundColor(usageDataManager.isMonitoring ? .green : .orange)
                     .frame(width: 24)
                 
-                Text("スクロール計測")
+                Text("使用時間計測")
                 
                 Spacer()
                 
@@ -116,7 +116,7 @@ struct SettingsView: View {
         } header: {
             Text("計測設定")
         } footer: {
-            Text("スクロール距離を計測するには、アクセシビリティ権限が必要です。")
+            Text("使用時間を計測するには、Screen Time権限が必要です。")
         }
     }
     
@@ -201,7 +201,7 @@ struct SettingsView: View {
         } header: {
             Text("通知設定")
         } footer: {
-            Text("毎日指定した時刻にスクロール距離をお知らせします。")
+            Text("毎日指定した時刻に使用時間をお知らせします。")
         }
     }
     
@@ -294,7 +294,7 @@ struct SettingsView: View {
         } header: {
             Text("データ管理")
         } footer: {
-            Text("スクロールデータはすべて端末内に保存され、外部に送信されることはありません。")
+            Text("使用時間データはすべて端末内に保存され、外部に送信されることはありません。")
         }
     }
     
@@ -402,7 +402,7 @@ struct ExcludedAppsView: View {
             } header: {
                 Text("アプリ一覧")
             } footer: {
-                Text("オフにしたアプリはスクロール距離の計測対象から除外されます。")
+                Text("オフにしたアプリは使用時間の計測対象から除外されます。")
             }
         }
         .navigationTitle("計測対象アプリ")

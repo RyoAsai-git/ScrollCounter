@@ -50,7 +50,7 @@ class NotificationManager: ObservableObject {
         let minute = calendar.component(.minute, from: notificationTime)
         
         let content = UNMutableNotificationContent()
-        content.title = "今日のスクロール記録"
+        content.title = "今日の使用時間記録"
         content.body = await generateNotificationMessage()
         content.sound = .default
         content.badge = 1
@@ -61,7 +61,7 @@ class NotificationManager: ObservableObject {
         dateComponents.minute = minute
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
-        let request = UNNotificationRequest(identifier: "dailyScrollNotification", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: "dailyUsageNotification", content: content, trigger: trigger)
         
         do {
             try await notificationCenter.add(request)
@@ -73,56 +73,61 @@ class NotificationManager: ObservableObject {
     
     // MARK: - 通知メッセージ生成
     private func generateNotificationMessage() async -> String {
-        // 今日のスクロール距離を取得（実際のアプリではScrollDataManagerから取得）
-        let todayDistance = await getCurrentScrollDistance()
+        // 今日の使用時間を取得（実際のアプリではUsageDataManagerから取得）
+        let todayDuration = await getCurrentUsageDuration()
         
         if !detoxNotificationsEnabled {
-            return "今日は\(formatDistance(todayDistance))スクロールしました。"
+            return "今日は\(formatDuration(todayDuration))使用しました。"
         }
         
         // デジタルデトックス促進メッセージ
-        if todayDistance >= 42195 {
-            return "🚨 今日は\(formatDistance(todayDistance))もスクロール！フルマラソン分です...今すぐデバイスから離れて休憩を"
-        } else if todayDistance >= 21098 {
-            return "⚠️ \(formatDistance(todayDistance))のスクロール...ハーフマラソン分の負担が指と目にかかっています"
-        } else if todayDistance >= 10000 {
-            return "😰 \(formatDistance(todayDistance))スクロール...陸上競技場25周分です。長時間の休憩をお勧めします"
-        } else if todayDistance >= 7000 {
-            return "💭 \(formatDistance(todayDistance))スクロール...東京駅〜渋谷駅分も画面を見続けました。目を休めましょう"
-        } else if todayDistance >= 5000 {
-            return "⏰ \(formatDistance(todayDistance))スクロール...5km分です。30分の休憩はいかがですか？"
-        } else if todayDistance >= 3000 {
-            return "🚶‍♀️ \(formatDistance(todayDistance))スクロール...リアル散歩(3km)より画面を見ています"
-        } else if todayDistance >= 1609 {
-            return "🏃‍♂️ \(formatDistance(todayDistance))スクロール...1マイル分です。実際に歩いてみませんか？"
-        } else if todayDistance >= 1000 {
-            return "📱 \(formatDistance(todayDistance))スクロール...1km分です。適度な休憩を心がけましょう"
-        } else if todayDistance >= 634 {
-            return "🏢 \(formatDistance(todayDistance))スクロール...スカイツリー分の縦移動です。首と目を休めて"
-        } else if todayDistance >= 400 {
-            return "🏃‍♂️ \(formatDistance(todayDistance))スクロール...競技場1周分です。立ち上がってストレッチを"
-        } else if todayDistance >= 333 {
-            return "🗼 \(formatDistance(todayDistance))スクロール...東京タワー分です。遠くを見て目を休めましょう"
-        } else if todayDistance >= 200 {
-            return "👀 \(formatDistance(todayDistance))スクロール...瞬きを忘れずに、20-20-20ルールを試してみて"
-        } else if todayDistance >= 100 {
-            return "😊 \(formatDistance(todayDistance))スクロール...まだ健康的な範囲です。この調子をキープ"
+        if todayDuration >= 28800 { // 8時間
+            return "🚨 今日は\(formatDuration(todayDuration))も使用！深刻なデジタル疲労の危険性...今すぐデバイスから離れて休憩を"
+        } else if todayDuration >= 21600 { // 6時間
+            return "⚠️ \(formatDuration(todayDuration))の使用時間...目と首の健康が心配です"
+        } else if todayDuration >= 18000 { // 5時間
+            return "😰 \(formatDuration(todayDuration))使用...デジタルデトックスが必要かもしれません"
+        } else if todayDuration >= 14400 { // 4時間
+            return "💭 \(formatDuration(todayDuration))使用...外の景色を見て目を休めましょう"
+        } else if todayDuration >= 10800 { // 3時間
+            return "⏰ \(formatDuration(todayDuration))使用...散歩で気分転換はいかがですか？"
+        } else if todayDuration >= 7200 { // 2時間
+            return "🚶‍♀️ \(formatDuration(todayDuration))使用...リアルな活動も大切です"
+        } else if todayDuration >= 3600 { // 1時間
+            return "🏃‍♂️ \(formatDuration(todayDuration))使用...適度な休憩を取りましょう"
+        } else if todayDuration >= 1800 { // 30分
+            return "📱 \(formatDuration(todayDuration))使用...良いペースを保っています"
+        } else if todayDuration >= 900 { // 15分
+            return "🏢 \(formatDuration(todayDuration))使用...首のストレッチを忘れずに"
+        } else if todayDuration >= 600 { // 10分
+            return "🏃‍♂️ \(formatDuration(todayDuration))使用...立ち上がって体を動かしましょう"
+        } else if todayDuration >= 300 { // 5分
+            return "🗼 \(formatDuration(todayDuration))使用...瞬きを意識してください"
+        } else if todayDuration >= 180 { // 3分
+            return "👀 \(formatDuration(todayDuration))使用...健康的な利用です"
+        } else if todayDuration >= 60 { // 1分
+            return "😊 \(formatDuration(todayDuration))使用...まだ適度な範囲です"
         } else {
-            return "✨ \(formatDistance(todayDistance))スクロール...控えめで素晴らしいです！バランスの取れたデジタルライフを"
+            return "✨ \(formatDuration(todayDuration))使用...控えめで素晴らしいです！バランスの取れたデジタルライフを"
         }
     }
     
-    private func getCurrentScrollDistance() async -> Double {
-        // 実際のアプリではScrollDataManagerから現在の距離を取得
-        // ここではデモ用のランダム値を返す
-        return Double.random(in: 0...8000)
+    private func getCurrentUsageDuration() async -> TimeInterval {
+        // 実際のアプリではUsageDataManagerから現在の使用時間を取得
+        // ここではデモ用のランダム値を返す（秒単位）
+        return TimeInterval.random(in: 0...14400) // 0-4時間
     }
     
-    private func formatDistance(_ distance: Double) -> String {
-        if distance >= 1000 {
-            return String(format: "%.1fkm", distance / 1000)
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let hours = Int(duration) / 3600
+        let minutes = Int(duration) % 3600 / 60
+        
+        if hours > 0 {
+            return "\(hours)時間\(minutes)分"
+        } else if minutes > 0 {
+            return "\(minutes)分"
         } else {
-            return "\(Int(distance))m"
+            return "1分未満"
         }
     }
     

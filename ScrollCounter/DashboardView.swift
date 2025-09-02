@@ -35,8 +35,8 @@ struct DashboardView: View {
             .navigationTitle("使用時間")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
-                // スクロール検出：プルリフレッシュ時にスクロール距離を記録
-                await simulateScrollDetection(appName: "ダッシュボード", distance: 50.0)
+                // 使用時間更新：プルリフレッシュ時に使用時間を記録
+                await simulateUsageUpdate(appName: "ダッシュボード", duration: 120.0)
                 
                 await usageDataManager.refreshData()
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
@@ -53,22 +53,22 @@ struct DashboardView: View {
         }
         .environmentObject(usageDataManager)
         .onAppear {
-            // 画面表示時にスクロール検出とデータ更新
+            // 画面表示時に使用時間更新とデータ更新
             Task {
-                await simulateScrollDetection(appName: "ダッシュボード", distance: 30.0)
+                await simulateUsageUpdate(appName: "ダッシュボード", duration: 90.0)
                 await usageDataManager.refreshData()
             }
         }
     }
     
-    // MARK: - スクロール検出シミュレーション
-    private func simulateScrollDetection(appName: String, distance: Double) async {
-        print("📱 [DashboardView] スクロール検出: \(appName) - \(distance)m")
+    // MARK: - 使用時間更新シミュレーション
+    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
+        print("📱 [DashboardView] 使用時間更新: \(appName) - \(Int(duration))秒")
         NotificationCenter.default.post(
-            name: NSNotification.Name("ScrollDetected"),
+            name: NSNotification.Name("UsageUpdated"),
             object: nil,
             userInfo: [
-                "distance": distance,
+                "duration": duration,
                 "appName": appName
             ]
         )
@@ -149,7 +149,7 @@ struct UsageMonitoringCard: View {
     }
 }
 
-// MARK: - 今日の総スクロール距離カード
+// MARK: - 今日の総使用時間カード
 struct TotalUsageCard: View {
     @EnvironmentObject var usageDataManager: UsageDataManager
     
@@ -349,7 +349,7 @@ struct AppRankingCard: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                     
-                    Text("アプリを使ってスクロールしてみましょう！")
+                    Text("アプリを使用してデータを蓄積しましょう！")
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -406,7 +406,7 @@ struct AppRankingRow: View {
                     .font(.body)
                     .fontWeight(.medium)
                 
-                Text("\(formatDistance(distance)) スクロール\(isAllTime ? " (累計)" : "")")
+                Text("\(usageDataManager.formatDuration(distance)) 使用\(isAllTime ? " (累計)" : "")")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

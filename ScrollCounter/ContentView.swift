@@ -38,10 +38,10 @@ struct ContentView: View {
         }
         .accentColor(.blue)
         .onChange(of: selectedTab) { _, newValue in
-            // タブ切り替え時にスクロール検出をシミュレート
+            // タブ切り替え時に使用時間更新をシミュレート
             let tabName = ["ダッシュボード", "履歴", "設定"][newValue]
             Task {
-                await simulateScrollDetection(appName: "タブ切り替え", distance: 15.0)
+                await simulateUsageUpdate(appName: "タブ切り替え", duration: 30.0)
             }
         }
         .onAppear {
@@ -64,14 +64,14 @@ struct ContentView: View {
         }
     }
     
-    // MARK: - スクロール検出シミュレーション
-    private func simulateScrollDetection(appName: String, distance: Double) async {
-        print("🏠 [ContentView] スクロール検出: \(appName) - \(distance)m")
+    // MARK: - 使用時間更新シミュレーション
+    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
+        print("🏠 [ContentView] 使用時間更新: \(appName) - \(Int(duration))秒")
         NotificationCenter.default.post(
-            name: NSNotification.Name("ScrollDetected"),
+            name: NSNotification.Name("UsageUpdated"),
             object: nil,
             userInfo: [
-                "distance": distance,
+                "duration": duration,
                 "appName": appName
             ]
         )

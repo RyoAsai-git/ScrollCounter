@@ -40,28 +40,28 @@ struct ChartView: View {
             .navigationTitle("使用時間履歴")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
-                // スクロール検出：プルリフレッシュ時にスクロール距離を記録
-                await simulateScrollDetection(appName: "履歴", distance: 40.0)
+                // 使用時間更新：プルリフレッシュ時に使用時間を記録
+                await simulateUsageUpdate(appName: "履歴", duration: 80.0)
                 await usageDataManager.refreshData()
             }
         }
         .environmentObject(usageDataManager)
         .onAppear {
-            // 画面表示時にスクロール検出
+            // 画面表示時に使用時間更新
             Task {
-                await simulateScrollDetection(appName: "履歴", distance: 25.0)
+                await simulateUsageUpdate(appName: "履歴", duration: 60.0)
             }
         }
     }
     
-    // MARK: - スクロール検出シミュレーション
-    private func simulateScrollDetection(appName: String, distance: Double) async {
-        print("📊 [ChartView] スクロール検出: \(appName) - \(distance)m")
+    // MARK: - 使用時間更新シミュレーション
+    private func simulateUsageUpdate(appName: String, duration: TimeInterval) async {
+        print("📊 [ChartView] 使用時間更新: \(appName) - \(Int(duration))秒")
         NotificationCenter.default.post(
-            name: NSNotification.Name("ScrollDetected"),
+            name: NSNotification.Name("UsageUpdated"),
             object: nil,
             userInfo: [
-                "distance": distance,
+                "duration": duration,
                 "appName": appName
             ]
         )
@@ -99,7 +99,7 @@ struct ChartView: View {
             if usageDataManager.weeklyData.isEmpty {
                 EmptyChartView()
             } else {
-                ScrollDistanceChart()
+                UsageTimeChart()
             }
         }
         .padding(20)
@@ -130,9 +130,9 @@ struct ChartView: View {
         .frame(height: 200)
     }
     
-    // MARK: - スクロール距離チャート
+    // MARK: - 使用時間チャート
     @ViewBuilder
-    private func ScrollDistanceChart() -> some View {
+    private func UsageTimeChart() -> some View {
         Chart(usageDataManager.weeklyData) { data in
             BarMark(
                 x: .value("日付", data.date, unit: .day),

@@ -154,9 +154,8 @@ class UsageDataManager: ObservableObject {
     }
     
     // 互換性のための古いメソッド名
-    func recordScrollData(distance: Double, appName: String) {
-        // 距離を時間として扱う（デモ用変換: 1m = 1秒）
-        let duration = TimeInterval(distance)
+    func recordUsageData(duration: TimeInterval, appName: String) {
+        // 使用時間データを記録
         todayTotalDuration += duration
         currentSessionData[appName, default: 0] += duration
         updateTopApps()
