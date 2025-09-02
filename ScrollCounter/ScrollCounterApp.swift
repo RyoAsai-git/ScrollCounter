@@ -22,17 +22,23 @@ class PersistenceController {
         let viewContext = result.container.viewContext
         
         // プレビュー用のサンプルデータを作成
+        let currentDate = Date()
+        
         let sampleData = ScrollDataEntity(context: viewContext)
-        sampleData.date = Date()
+        sampleData.date = currentDate
         sampleData.totalDistance = 2500.0
         sampleData.appName = "Twitter"
         sampleData.distance = 1200.0
+        sampleData.sessionDistance = 1200.0
+        sampleData.timestamp = currentDate
         
         let sampleData2 = ScrollDataEntity(context: viewContext)
-        sampleData2.date = Date()
+        sampleData2.date = currentDate
         sampleData2.totalDistance = 2500.0
         sampleData2.appName = "Instagram"
         sampleData2.distance = 800.0
+        sampleData2.sessionDistance = 800.0
+        sampleData2.timestamp = currentDate
         
         do {
             try viewContext.save()
