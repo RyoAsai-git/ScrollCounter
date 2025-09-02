@@ -1,7 +1,15 @@
+// MARK: - このファイルはUsageDataManagerに移行されました
+// 互換性のためにtypealiasを使用してXcodeプロジェクトの参照を維持
+
 import Foundation
 import CoreData
 import SwiftUI
 import Combine
+
+// MARK: - 型の互換性エイリアス
+typealias ScrollDataManager = UsageDataManager
+typealias AppScrollData = AppUsageData
+typealias DailyScrollData = DailyUsageData
 
 // MARK: - アプリデータ構造体
 struct AppUsageData {
@@ -27,6 +35,11 @@ class UsageDataManager: ObservableObject {
     @Published var isMonitoring: Bool = false
     @Published var hasScreenTimePermission: Bool = false
     @Published var appStartDate: Date = Date()
+    
+    // 互換性のための古いプロパティ名
+    var todayTotalDistance: TimeInterval { todayTotalDuration }
+    var yesterdayTotalDistance: TimeInterval { yesterdayTotalDuration }
+    var hasAccessibilityPermission: Bool { hasScreenTimePermission }
     
     private var cancellables = Set<AnyCancellable>()
     private var monitoringTimer: Timer?
@@ -77,12 +90,22 @@ class UsageDataManager: ObservableObject {
         }
     }
     
+    // 互換性のための古いメソッド名
+    func formatDistance(_ duration: TimeInterval) -> String {
+        return formatDuration(duration)
+    }
+    
     // MARK: - 権限チェック（Screen Time API用）
     func requestScreenTimePermission() async {
         // Screen Time APIでは FamilyControls framework を使用
         // 実際の実装では権限リクエストが必要
         hasScreenTimePermission = true
         print("📱 Screen Time権限が利用可能です")
+    }
+    
+    // 互換性のための古いメソッド名
+    func requestAccessibilityPermission() async {
+        await requestScreenTimePermission()
     }
     
     private func checkScreenTimePermission() {
@@ -128,6 +151,23 @@ class UsageDataManager: ObservableObject {
         saveCurrentData()
         
         print("📱 使用時間更新: +\(formatDuration(additionalTime)) (総計: \(formatDuration(todayTotalDuration)))")
+    }
+    
+    // 互換性のための古いメソッド名
+    func recordScrollData(distance: Double, appName: String) {
+        // 距離を時間として扱う（デモ用変換: 1m = 1秒）
+        let duration = TimeInterval(distance)
+        todayTotalDuration += duration
+        currentSessionData[appName, default: 0] += duration
+        updateTopApps()
+    }
+    
+    func refreshData() async {
+        print("🔄 [UsageDataManager] データ更新中...")
+        loadTodayData()
+        loadWeeklyData()
+        updateTopApps()
+        print("✅ [UsageDataManager] データ更新完了")
     }
     
     // MARK: - データ読み込み
