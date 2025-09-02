@@ -305,16 +305,16 @@ struct AppRankingCard: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
-                HStack {
+            HStack {
                     Image(systemName: showAllTime ? "crown.fill" : "list.number")
-                        .font(.title2)
+                    .font(.title2)
                         .foregroundColor(showAllTime ? .yellow : .orange)
-                    
+                
                     Text(rankingTitle)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                    
-                    Spacer()
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
                     
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.3)) {
@@ -430,15 +430,15 @@ struct AppRankingRow: View {
             default: return .purple
             }
         } else {
-            switch rank {
-            case 1: return .yellow
-            case 2: return .gray
-            case 3: return .orange
-            default: return .blue
-            }
+        switch rank {
+        case 1: return .yellow
+        case 2: return .gray
+        case 3: return .orange
+        default: return .blue
         }
     }
-    
+}
+
     private func formatDistance(_ distance: Double) -> String {
         if distance >= 1000 {
             return String(format: "%.1fkm", distance / 1000)
@@ -454,44 +454,40 @@ struct DigitalDetoxCard: View {
     @State private var showingRestMode = false
     
     var conversionText: String {
-                    let duration = usageDataManager.todayTotalDuration
+        let duration = usageDataManager.todayTotalDuration
         
-        if distance >= 42195 {
-            return "⚠️ フルマラソン分もスクロール...指の疲労が心配です"
-        } else if distance >= 21098 {
-            return "😰 ハーフマラソン分のスクロール...休憩しませんか？"
-        } else if distance >= 10000 {
-            return "📱💦 10kmも親指で移動...デジタル疲労に注意"
-        } else if distance >= 7000 {
-            return "🚇😵 東京駅〜渋谷駅分も画面を見続けました"
-        } else if distance >= 5000 {
-            return "⏰ 5km分のスクロール...外の散歩はいかがですか？"
-        } else if distance >= 3000 {
-            return "🚶‍♀️ リアル散歩(3km)より画面を見ています"
-        } else if distance >= 1852 {
-            return "⛵ 1海里分のスクロール...目を休めましょう"
-        } else if distance >= 1609 {
-            return "🏃‍♂️ 1マイル分...実際に走った方が健康的かも"
-        } else if distance >= 1000 {
-            return "📱🤔 1km分のスクロール...ちょっと多くないですか？"
-        } else if distance >= 800 {
-            return "🏃‍♂️ 競技場2周分...実際の運動も忘れずに"
-        } else if distance >= 634 {
-            return "🏢 スカイツリー分の縦スクロール...首は大丈夫？"
-        } else if distance >= 400 {
-            return "🏃‍♂️ 競技場1周分...立ち上がってストレッチを"
-        } else if distance >= 333 {
-            return "🗼 東京タワー分...目の高さを変えて休憩を"
-        } else if distance >= 200 {
-            return "🏊‍♂️ プール8往復分...瞬きを忘れていませんか？"
-        } else if distance >= 110 {
-            return "⚽ サッカーコート分...外の緑を見ませんか？"
-        } else if distance >= 100 {
-            return "🏃‍♂️ 100m分のスクロール...まだ適度な範囲です"
-        } else if distance >= 50 {
-            return "🏊‍♂️ プール往復分...良いペースですね"
-        } else if distance >= 25 {
-            return "😊 適度なスクロール量です"
+        if duration >= 28800 { // 8時間
+            return "⚠️ 8時間も画面を見続けています...深刻なデジタル疲労の危険性"
+        } else if duration >= 21600 { // 6時間
+            return "😰 6時間の使用時間...目と首の健康が心配です"
+        } else if duration >= 18000 { // 5時間
+            return "📱💦 5時間も画面に集中...デジタルデトックスが必要かも"
+        } else if duration >= 14400 { // 4時間
+            return "🚇😵 4時間の連続使用...外の景色を見ませんか？"
+        } else if duration >= 10800 { // 3時間
+            return "⏰ 3時間の使用時間...散歩で気分転換はいかがですか？"
+        } else if duration >= 7200 { // 2時間
+            return "🚶‍♀️ 2時間の画面時間...リアルな活動も大切です"
+        } else if duration >= 5400 { // 1.5時間
+            return "⛵ 1.5時間の使用...目を休めて遠くを見ましょう"
+        } else if duration >= 3600 { // 1時間
+            return "🏃‍♂️ 1時間の使用時間...適度な休憩を取りましょう"
+        } else if duration >= 2700 { // 45分
+            return "📱🤔 45分の使用...まだ健康的な範囲内です"
+        } else if duration >= 1800 { // 30分
+            return "🏃‍♂️ 30分の使用...良いペースを保っています"
+        } else if duration >= 1200 { // 20分
+            return "🏢 20分の使用時間...首のストレッチを忘れずに"
+        } else if duration >= 900 { // 15分
+            return "🏃‍♂️ 15分の使用...立ち上がって体を動かしましょう"
+        } else if duration >= 600 { // 10分
+            return "🗼 10分の使用...瞬きを意識してください"
+        } else if duration >= 300 { // 5分
+            return "🏊‍♂️ 5分の使用...健康的な利用です"
+        } else if duration >= 180 { // 3分
+            return "⚽ 3分の使用...外の緑も見てくださいね"
+        } else if duration >= 60 { // 1分
+            return "🏃‍♂️ 1分の使用...まだ適度な範囲です"
         } else {
             return "✨ 今日はまだ控えめ...良い習慣です！"
         }
@@ -539,18 +535,18 @@ struct DigitalDetoxCard: View {
         }
     }
     
-    private func startDigitalDetox() {
-                    let duration = usageDataManager.todayTotalDuration
+        private func startDigitalDetox() {
+        let duration = usageDataManager.todayTotalDuration
         var detoxMessage = ""
         var recommendedDuration = 5 // デフォルト5分
         
-        if distance >= 10000 {
-            detoxMessage = "⚠️ 今日のスクロール量が10kmを超えています。\n30分間の本格的な休憩で目と体を回復させましょう。"
+        if duration >= 14400 { // 4時間
+            detoxMessage = "⚠️ 今日の使用時間が4時間を超えています。\n30分間の本格的な休憩で目と体を回復させましょう。"
             recommendedDuration = 30
-        } else if distance >= 5000 {
-            detoxMessage = "⏰ 今日のスクロール量を見直し、20分間画面から離れませんか？\n🌿 散歩、読書、瞑想などをお試しください。"
+        } else if duration >= 7200 { // 2時間
+            detoxMessage = "⏰ 今日の使用時間を見直し、20分間画面から離れませんか？\n🌿 散歩、読書、瞑想などをお試しください。"
             recommendedDuration = 20
-        } else if distance >= 1000 {
+        } else if duration >= 3600 { // 1時間
             detoxMessage = "📱 適度な休憩を取りましょう！\n👀 10分間の休憩で20-20-20ルールを実践してみませんか？"
             recommendedDuration = 10
         } else {
@@ -578,13 +574,13 @@ struct DigitalDetoxCard: View {
     
     // 推奨休憩時間を取得
     private func getRecommendedRestDuration() -> Int {
-                    let duration = usageDataManager.todayTotalDuration
+        let duration = usageDataManager.todayTotalDuration
         
-        if distance >= 10000 {
+        if duration >= 14400 { // 4時間
             return 30
-        } else if distance >= 5000 {
+        } else if duration >= 7200 { // 2時間
             return 20
-        } else if distance >= 1000 {
+        } else if duration >= 3600 { // 1時間
             return 10
         } else {
             return 5
