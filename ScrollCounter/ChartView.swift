@@ -2,7 +2,7 @@ import SwiftUI
 import Charts
 
 struct ChartView: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     @State private var selectedDataPoint: DailyScrollData?
     @State private var selectedTimeRange: TimeRange = .week
     
@@ -42,10 +42,10 @@ struct ChartView: View {
             .refreshable {
                 // スクロール検出：プルリフレッシュ時にスクロール距離を記録
                 await simulateScrollDetection(appName: "履歴", distance: 40.0)
-                await scrollDataManager.refreshData()
+                await usageDataManager.refreshData()
             }
         }
-        .environmentObject(scrollDataManager)
+        .environmentObject(usageDataManager)
         .onAppear {
             // 画面表示時にスクロール検出
             Task {
@@ -96,7 +96,7 @@ struct ChartView: View {
                 Spacer()
             }
             
-            if scrollDataManager.weeklyData.isEmpty {
+            if usageDataManager.weeklyData.isEmpty {
                 EmptyChartView()
             } else {
                 ScrollDistanceChart()
@@ -133,7 +133,7 @@ struct ChartView: View {
     // MARK: - スクロール距離チャート
     @ViewBuilder
     private func ScrollDistanceChart() -> some View {
-        Chart(scrollDataManager.weeklyData) { data in
+        Chart(usageDataManager.weeklyData) { data in
             BarMark(
                 x: .value("日付", data.date, unit: .day),
                 y: .value("距離", data.totalDistance)
@@ -172,7 +172,7 @@ struct ChartView: View {
         }
         .onTapGesture {
             // チャートタップ時の処理（簡略化）
-            if let firstData = scrollDataManager.weeklyData.first {
+            if let firstData = usageDataManager.weeklyData.first {
                 selectedDataPoint = firstData
             }
         }
@@ -308,28 +308,28 @@ struct ChartView: View {
     
     // MARK: - 計算プロパティ
     private var weeklyAverage: Double {
-        guard !scrollDataManager.weeklyData.isEmpty else { return 0 }
-        let total = scrollDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
-        return total / Double(scrollDataManager.weeklyData.count)
+        guard !usageDataManager.weeklyData.isEmpty else { return 0 }
+        let total = usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
+        return total / Double(usageDataManager.weeklyData.count)
     }
     
     private var weeklyMax: Double {
-        scrollDataManager.weeklyData.map(\.totalDistance).max() ?? 0
+        usageDataManager.weeklyData.map(\.totalDistance).max() ?? 0
     }
     
     private var weeklyTotal: Double {
-        scrollDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
+        usageDataManager.weeklyData.reduce(0) { $0 + $1.totalDistance }
     }
     
     private var trendMessage: String {
-        guard scrollDataManager.weeklyData.count >= 2 else {
+        guard usageDataManager.weeklyData.count >= 2 else {
             return "データが不足しています。もう少し使い続けてトレンドを確認しましょう。"
         }
         
-        let recent = Array(scrollDataManager.weeklyData.suffix(3))
+        let recent = Array(usageDataManager.weeklyData.suffix(3))
         let recentAverage = recent.reduce(0) { $0 + $1.totalDistance } / Double(recent.count)
         
-        let earlier = Array(scrollDataManager.weeklyData.prefix(3))
+        let earlier = Array(usageDataManager.weeklyData.prefix(3))
         let earlierAverage = earlier.reduce(0) { $0 + $1.totalDistance } / Double(earlier.count)
         
         if recentAverage > earlierAverage * 1.2 {

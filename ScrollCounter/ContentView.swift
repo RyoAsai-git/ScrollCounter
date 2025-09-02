@@ -2,14 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 0
-    @StateObject private var scrollDataManager = ScrollDataManager()
+    @StateObject private var usageDataManager = UsageDataManager()
     @StateObject private var notificationManager = NotificationManager()
     
     var body: some View {
         TabView(selection: $selectedTab) {
             // ダッシュボード画面
             DashboardView()
-                .environmentObject(scrollDataManager)
+                .environmentObject(usageDataManager)
                 .environmentObject(notificationManager)
                 .tabItem {
                     Image(systemName: "chart.bar.fill")
@@ -19,7 +19,7 @@ struct ContentView: View {
             
             // グラフ画面
             ChartView()
-                .environmentObject(scrollDataManager)
+                .environmentObject(usageDataManager)
                 .tabItem {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                     Text("履歴")
@@ -28,7 +28,7 @@ struct ContentView: View {
             
             // 設定画面
             SettingsView()
-                .environmentObject(scrollDataManager)
+                .environmentObject(usageDataManager)
                 .environmentObject(notificationManager)
                 .tabItem {
                     Image(systemName: "gearshape.fill")

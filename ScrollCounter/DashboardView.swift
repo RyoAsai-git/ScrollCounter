@@ -1,18 +1,18 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     @State private var showMotivationMessage = false
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    // 今日のスクロール距離カード
-                    TotalDistanceCard()
+                    // 今日の総使用時間カード
+                    TotalUsageCard()
                     
-                    // スクロール検出状況カード
-                    ScrollDetectionStatusCard()
+                    // 使用時間監視状況カード
+                    UsageMonitoringCard()
                     
                     // モチベーションメッセージ
                     if showMotivationMessage {
@@ -32,7 +32,7 @@ struct DashboardView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
-            .navigationTitle("スクロール距離")
+            .navigationTitle("使用時間")
             .navigationBarTitleDisplayMode(.large)
             .refreshable {
                 // スクロール検出：プルリフレッシュ時にスクロール距離を記録
@@ -76,9 +76,9 @@ struct DashboardView: View {
     }
 }
 
-// MARK: - スクロール検出状況カード
-struct ScrollDetectionStatusCard: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+// MARK: - 使用時間監視状況カード
+struct UsageMonitoringCard: View {
+    @EnvironmentObject var usageDataManager: UsageDataManager
     
     var body: some View {
         VStack(spacing: 16) {
@@ -133,7 +133,7 @@ struct ScrollDetectionStatusCard: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
-                    Text("\(scrollDataManager.topApps.count)")
+                    Text("\(usageDataManager.topApps.count)")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.orange)
@@ -150,8 +150,8 @@ struct ScrollDetectionStatusCard: View {
 }
 
 // MARK: - 今日の総スクロール距離カード
-struct TotalDistanceCard: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+struct TotalUsageCard: View {
+    @EnvironmentObject var usageDataManager: UsageDataManager
     
     var body: some View {
         VStack(spacing: 16) {
@@ -160,7 +160,7 @@ struct TotalDistanceCard: View {
                     .font(.title2)
                     .foregroundColor(.blue)
                 
-                Text("今日のスクロール距離")
+                Text("今日の総使用時間")
                     .font(.headline)
                     .fontWeight(.semibold)
                 
@@ -168,14 +168,14 @@ struct TotalDistanceCard: View {
             }
             
             VStack(spacing: 8) {
-                Text(formatDistance(scrollDataManager.todayTotalDistance))
+                Text(usageDataManager.formatDuration(usageDataManager.todayTotalDuration))
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                     .onAppear {
-                        print("🖼️ [TotalDistanceCard] 表示距離: \(scrollDataManager.todayTotalDistance)m")
+                        print("🖼️ [TotalUsageCard] 表示時間: \(usageDataManager.formatDuration(usageDataManager.todayTotalDuration))")
                     }
                 
-                Text("メートル")
+                Text("使用時間")
                     .font(.title3)
                     .foregroundColor(.secondary)
             }
@@ -217,30 +217,31 @@ struct TotalDistanceCard: View {
 
 // MARK: - モチベーションカード
 struct MotivationCard: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     
     var motivationMessage: String {
-        let distance = scrollDataManager.todayTotalDistance
-        let yesterdayDistance = scrollDataManager.yesterdayTotalDistance
+        let duration = usageDataManager.todayTotalDuration
+        let yesterdayDuration = usageDataManager.yesterdayTotalDuration
         
-        if distance > yesterdayDistance && distance > 2000 {
-            return "⚠️ 昨日より\(Int(distance - yesterdayDistance))m多くスクロール中...休憩時間を増やしませんか？"
-        } else if distance >= 10000 {
-            return "🚨 スクロール量が10kmに...デジタル疲労が心配です"
-        } else if distance >= 5000 {
-            return "⏰ 5km分のスクロール...30分の休憩をお勧めします"
-        } else if distance >= 3000 {
-            return "💭 3km分も画面を見続けています...目を休めませんか？"
-        } else if distance >= 1609 {
-            return "📱 1マイル分のスクロール...適度な休憩を心がけましょう"
-        } else if distance >= 1000 {
-            return "👀 1km分のスクロール...瞬きを忘れずに"
-        } else if distance >= 400 {
-            return "😌 400m分のスクロール...まだ健康的な範囲です"
-        } else if distance >= 100 {
-            return "👍 適度なスクロール量をキープしています"
+        if duration > yesterdayDuration && duration > 7200 { // 2時間
+            let diff = duration - yesterdayDuration
+            return "⚠️ 昨日より\(usageDataManager.formatDurationShort(diff))多く使用中...休憩時間を増やしませんか？"
+        } else if duration >= 14400 { // 4時間
+            return "🚨 使用時間が4時間に...デジタル疲労が心配です"
+        } else if duration >= 10800 { // 3時間
+            return "⏰ 3時間の使用...30分の休憩をお勧めします"
+        } else if duration >= 7200 { // 2時間
+            return "💭 2時間も画面を見続けています...目を休めませんか？"
+        } else if duration >= 3600 { // 1時間
+            return "📱 1時間の使用...適度な休憩を心がけましょう"
+        } else if duration >= 1800 { // 30分
+            return "👀 30分の使用...瞬きを忘れずに"
+        } else if duration >= 900 { // 15分
+            return "😌 15分の使用...まだ健康的な範囲です"
+        } else if duration >= 300 { // 5分
+            return "👍 適度な使用時間をキープしています"
         } else {
-            return "✨ 今日は控えめなスクロール...素晴らしい自制心です！"
+            return "✨ 今日は控えめな使用...素晴らしい自制心です！"
         }
     }
     
@@ -274,11 +275,11 @@ struct MotivationCard: View {
 
 // MARK: - アプリ別ランキングカード
 struct AppRankingCard: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     @State private var showAllTime = false
     
-    var currentApps: [AppScrollData] {
-        showAllTime ? scrollDataManager.allTimeTopApps : scrollDataManager.topApps
+    var currentApps: [AppUsageData] {
+        showAllTime ? usageDataManager.allTimeTopApps : usageDataManager.topApps
     }
     
     var rankingTitle: String {
@@ -449,7 +450,7 @@ struct AppRankingRow: View {
 
 // MARK: - デジタルデトックス促進カード
 struct DigitalDetoxCard: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     @State private var showingRestMode = false
     
     var conversionText: String {
@@ -754,7 +755,7 @@ struct DigitalRestModeView: View {
 struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
         DashboardView()
-            .environmentObject(ScrollDataManager())
+            .environmentObject(UsageDataManager())
             .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var scrollDataManager: ScrollDataManager
+    @EnvironmentObject var usageDataManager: UsageDataManager
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var showingAccessibilityAlert = false
     @State private var showingNotificationAlert = false
@@ -78,14 +78,14 @@ struct SettingsView: View {
                     Text("アクセシビリティ権限")
                         .font(.body)
                     
-                    Text(scrollDataManager.hasAccessibilityPermission ? "有効" : "無効")
+                    Text(usageDataManager.hasAccessibilityPermission ? "有効" : "無効")
                         .font(.caption)
-                        .foregroundColor(scrollDataManager.hasAccessibilityPermission ? .green : .red)
+                        .foregroundColor(usageDataManager.hasAccessibilityPermission ? .green : .red)
                 }
                 
                 Spacer()
                 
-                if !scrollDataManager.hasAccessibilityPermission {
+                if !usageDataManager.hasAccessibilityPermission {
                     Button("設定") {
                         showingAccessibilityAlert = true
                     }
@@ -94,8 +94,8 @@ struct SettingsView: View {
             }
             
             HStack {
-                Image(systemName: scrollDataManager.isMonitoring ? "play.circle.fill" : "pause.circle.fill")
-                    .foregroundColor(scrollDataManager.isMonitoring ? .green : .orange)
+                Image(systemName: usageDataManager.isMonitoring ? "play.circle.fill" : "pause.circle.fill")
+                    .foregroundColor(usageDataManager.isMonitoring ? .green : .orange)
                     .frame(width: 24)
                 
                 Text("スクロール計測")
@@ -103,12 +103,12 @@ struct SettingsView: View {
                 Spacer()
                 
                 Toggle("", isOn: Binding(
-                    get: { scrollDataManager.isMonitoring },
+                    get: { usageDataManager.isMonitoring },
                     set: { newValue in
                         if newValue {
-                            scrollDataManager.startMonitoring()
+                            usageDataManager.startMonitoring()
                         } else {
-                            scrollDataManager.stopMonitoring()
+                            usageDataManager.stopMonitoring()
                         }
                     }
                 ))
@@ -248,7 +248,7 @@ struct SettingsView: View {
     private func DataManagementSection() -> some View {
         Section {
             Button(action: {
-                scrollDataManager.saveCurrentData()
+                usageDataManager.saveCurrentData()
             }) {
                 HStack {
                     Image(systemName: "square.and.arrow.down")
