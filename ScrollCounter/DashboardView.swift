@@ -28,6 +28,9 @@ struct DashboardView: View {
                     
                     // デジタルデトックス促進カード
                     DigitalDetoxCard()
+                    
+                    // デジタルデトックスタイマーカード
+                    DigitalDetoxTimerCard()
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
@@ -745,6 +748,366 @@ struct DigitalRestModeView: View {
            let window = windowScene.windows.first {
             window.rootViewController?.present(alert, animated: true)
         }
+    }
+}
+
+// MARK: - デジタルデトックスタイマーカード
+struct DigitalDetoxTimerCard: View {
+    @State private var selectedMinutes: Int = 15
+    @State private var showingTimerMode = false
+    @State private var isTimerActive = false
+    
+    let timerOptions = [5, 10, 15, 30, 45, 60]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "timer")
+                    .font(.title2)
+                    .foregroundColor(.green)
+                
+                Text("デジタルデトックスタイマー")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+            }
+            
+            VStack(alignment: .leading, spacing: 12) {
+                Text("設定した時間だけデジタルデバイスから離れて、心と体をリフレッシュしましょう。")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                
+                // タイマー時間選択
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("休憩時間")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(timerOptions, id: \.self) { minutes in
+                                Button(action: {
+                                    selectedMinutes = minutes
+                                }) {
+                                    Text("\(minutes)分")
+                                        .font(.body)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(selectedMinutes == minutes ? .white : .green)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(selectedMinutes == minutes ? Color.green : Color.green.opacity(0.1))
+                                        )
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 4)
+                    }
+                }
+                
+                // タイマー開始ボタン
+                Button(action: {
+                    startDetoxTimer()
+                }) {
+                    HStack {
+                        Image(systemName: "play.circle.fill")
+                            .font(.title3)
+                        
+                        Text("\(selectedMinutes)分のデトックス開始")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.green, .mint]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+                }
+                .disabled(isTimerActive)
+                .opacity(isTimerActive ? 0.6 : 1.0)
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+        )
+        .fullScreenCover(isPresented: $showingTimerMode) {
+            DetoxTimerModeView(
+                duration: selectedMinutes * 60,
+                isPresented: $showingTimerMode,
+                onTimerComplete: {
+                    isTimerActive = false
+                }
+            )
+        }
+    }
+    
+    private func startDetoxTimer() {
+        isTimerActive = true
+        showingTimerMode = true
+    }
+}
+
+// MARK: - デトックスタイマーモード画面
+struct DetoxTimerModeView: View {
+    @State private var timeRemaining: Int
+    @State private var isActive = true
+    @State private var timer: Timer?
+    @State private var originalBrightness: CGFloat = 0.5
+    @Binding var isPresented: Bool
+    
+    let duration: Int // 秒単位
+    let onTimerComplete: () -> Void
+    
+    init(duration: Int, isPresented: Binding<Bool>, onTimerComplete: @escaping () -> Void) {
+        self.duration = duration
+        self._timeRemaining = State(initialValue: duration)
+        self._isPresented = isPresented
+        self.onTimerComplete = onTimerComplete
+    }
+    
+    var body: some View {
+        ZStack {
+            // 背景グラデーション
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.green.opacity(0.3),
+                    Color.mint.opacity(0.2),
+                    Color.blue.opacity(0.1)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 40) {
+                // ヘッダー
+                VStack(spacing: 16) {
+                    Image(systemName: "leaf.circle.fill")
+                        .font(.system(size: 80))
+                        .foregroundColor(.green)
+                    
+                    Text("デジタルデトックス中")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("心と体をリフレッシュする時間です")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                
+                // タイマー表示
+                VStack(spacing: 24) {
+                    ZStack {
+                        Circle()
+                            .stroke(Color.green.opacity(0.3), lineWidth: 8)
+                            .frame(width: 200, height: 200)
+                        
+                        Circle()
+                            .trim(from: 0, to: CGFloat(timeRemaining) / CGFloat(duration))
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.green, .mint]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(-90))
+                            .frame(width: 200, height: 200)
+                            .animation(.linear(duration: 1), value: timeRemaining)
+                        
+                        VStack(spacing: 4) {
+                            Text(formatTime(timeRemaining))
+                                .font(.system(size: 36, weight: .bold, design: .monospaced))
+                                .foregroundColor(.primary)
+                            
+                            Text("残り時間")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    // 進捗情報
+                    VStack(spacing: 8) {
+                        Text("進捗: \(Int((1 - Double(timeRemaining) / Double(duration)) * 100))%")
+                            .font(.headline)
+                            .foregroundColor(.green)
+                        
+                        ProgressView(value: 1 - Double(timeRemaining) / Double(duration))
+                            .progressViewStyle(LinearProgressViewStyle(tint: .green))
+                            .frame(width: 200)
+                    }
+                }
+                
+                // 推奨活動
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("おすすめの過ごし方")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                        RecommendationItem(icon: "figure.walk", text: "散歩する")
+                        RecommendationItem(icon: "book", text: "読書する")
+                        RecommendationItem(icon: "leaf", text: "瞑想する")
+                        RecommendationItem(icon: "cup.and.saucer", text: "お茶を飲む")
+                        RecommendationItem(icon: "music.note", text: "音楽を聴く")
+                        RecommendationItem(icon: "bed.double", text: "休憩する")
+                    }
+                }
+                .padding(.horizontal, 20)
+                
+                Spacer()
+                
+                // 制御ボタン
+                HStack(spacing: 20) {
+                    Button(action: {
+                        pauseResumeTimer()
+                    }) {
+                        HStack {
+                            Image(systemName: isActive ? "pause.circle" : "play.circle")
+                            Text(isActive ? "一時停止" : "再開")
+                        }
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(25)
+                    }
+                    
+                    Button(action: {
+                        stopTimer()
+                    }) {
+                        HStack {
+                            Image(systemName: "stop.circle")
+                            Text("終了")
+                        }
+                        .foregroundColor(.red)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(25)
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 40)
+        }
+        .onAppear {
+            setupTimer()
+            adjustBrightness()
+            disableIdleTimer()
+        }
+        .onDisappear {
+            cleanupTimer()
+            restoreBrightness()
+            enableIdleTimer()
+        }
+    }
+    
+    // MARK: - タイマー制御
+    private func setupTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            if isActive && timeRemaining > 0 {
+                timeRemaining -= 1
+                
+                if timeRemaining == 0 {
+                    completeTimer()
+                }
+            }
+        }
+    }
+    
+    private func pauseResumeTimer() {
+        isActive.toggle()
+    }
+    
+    private func stopTimer() {
+        cleanupTimer()
+        isPresented = false
+        onTimerComplete()
+    }
+    
+    private func completeTimer() {
+        cleanupTimer()
+        
+        // 完了通知
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+        
+        // 少し待ってから画面を閉じる
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            isPresented = false
+            onTimerComplete()
+        }
+    }
+    
+    private func cleanupTimer() {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    // MARK: - デバイス制御
+    private func adjustBrightness() {
+        originalBrightness = UIScreen.main.brightness
+        UIScreen.main.brightness = 0.3 // 低い明度に設定
+    }
+    
+    private func restoreBrightness() {
+        UIScreen.main.brightness = originalBrightness
+    }
+    
+    private func disableIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    
+    private func enableIdleTimer() {
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+    
+    // MARK: - ヘルパー関数
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
+    }
+}
+
+// MARK: - 推奨活動アイテム
+struct RecommendationItem: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(.green)
+                .frame(width: 20)
+            
+            Text(text)
+                .font(.body)
+                .foregroundColor(.primary)
+            
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.green.opacity(0.1))
+        )
     }
 }
 
