@@ -7,8 +7,8 @@ import SwiftUI
 import Combine
 
 // MARK: - 型の互換性エイリアス
-typealias ScrollDataManager = RealUsageDataManager
-typealias UsageDataManager = RealUsageDataManager
+typealias ScrollDataManager = SimpleUsageDataManager
+typealias UsageDataManager = SimpleUsageDataManager
 typealias AppScrollData = AppUsageData
 typealias DailyScrollData = DailyUsageData
 

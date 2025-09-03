@@ -5,30 +5,31 @@ struct SettingsView: View {
     @EnvironmentObject var notificationManager: NotificationManager
     @State private var showingAccessibilityAlert = false
     @State private var showingNotificationAlert = false
+    @State private var showMotivationMessages = true
     
     var body: some View {
         NavigationView {
             List {
-                // アクセシビリティ設定セクション
-                AccessibilitySection()
+                // アプリ使用状況セクション
+                AppUsageSection()
                 
                 // 通知設定セクション
                 NotificationSection()
                 
                 // 表示設定セクション
                 DisplaySection()
-                
-                // データ管理セクション
-                DataManagementSection()
-                
-                // アプリ情報セクション
-                AppInfoSection()
             }
             .navigationTitle("設定")
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear {
-            // 画面表示時の処理
+            // UserDefaultsから設定を読み込み
+            showMotivationMessages = UserDefaults.standard.bool(forKey: "showMotivationMessages")
+            if UserDefaults.standard.object(forKey: "showMotivationMessages") == nil {
+                // 初回起動時はデフォルトでtrueに設定
+                showMotivationMessages = true
+                UserDefaults.standard.set(true, forKey: "showMotivationMessages")
+            }
         }
         .alert("アクセシビリティ設定", isPresented: $showingAccessibilityAlert) {
             Button("設定を開く") {
@@ -48,32 +49,25 @@ struct SettingsView: View {
         }
     }
     
-    // MARK: - アクセシビリティ設定セクション
+    // MARK: - アプリ使用状況セクション
     @ViewBuilder
-    private func AccessibilitySection() -> some View {
+    private func AppUsageSection() -> some View {
         Section {
             HStack {
-                Image(systemName: "accessibility")
+                Image(systemName: "chart.bar.fill")
                     .foregroundColor(.blue)
                     .frame(width: 24)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("アクセシビリティ権限")
+                    Text("データ収集状況")
                         .font(.body)
                     
-                    Text(usageDataManager.hasAccessibilityPermission ? "有効" : "無効")
+                    Text(usageDataManager.isMonitoring ? "収集中" : "停止中")
                         .font(.caption)
-                        .foregroundColor(usageDataManager.hasAccessibilityPermission ? .green : .red)
+                        .foregroundColor(usageDataManager.isMonitoring ? .green : .red)
                 }
                 
                 Spacer()
-                
-                if !usageDataManager.hasAccessibilityPermission {
-                    Button("設定") {
-                        showingAccessibilityAlert = true
-                    }
-                    .buttonStyle(.bordered)
-                }
             }
             
             HStack {
@@ -81,7 +75,7 @@ struct SettingsView: View {
                     .foregroundColor(usageDataManager.isMonitoring ? .green : .orange)
                     .frame(width: 24)
                 
-                Text("使用時間計測")
+                Text("使用時間追跡")
                 
                 Spacer()
                 
@@ -97,9 +91,9 @@ struct SettingsView: View {
                 ))
             }
         } header: {
-            Text("計測設定")
+            Text("使用状況")
         } footer: {
-            Text("使用時間を計測するには、Screen Time権限が必要です。")
+            Text("アプリの使用パターンを記録し、デジタルデトックスをサポートします。すべてのデータは端末内に保存されます。")
         }
     }
     
@@ -163,23 +157,6 @@ struct SettingsView: View {
                         }
                     ))
                 }
-                
-                Button(action: {
-                    Task {
-                        await notificationManager.sendTestNotification()
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "paperplane")
-                            .foregroundColor(.green)
-                            .frame(width: 24)
-                        
-                        Text("テスト通知を送信")
-                            .foregroundColor(.primary)
-                        
-                        Spacer()
-                    }
-                }
             }
         } header: {
             Text("通知設定")
@@ -192,147 +169,27 @@ struct SettingsView: View {
     @ViewBuilder
     private func DisplaySection() -> some View {
         Section {
-            NavigationLink(destination: ExcludedAppsView()) {
-                HStack {
-                    Image(systemName: "app.badge.checkmark")
-                        .foregroundColor(.blue)
-                        .frame(width: 24)
-                    
-                    Text("計測対象アプリ")
-                    
-                    Spacer()
-                    
-                    Text("管理")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            
             HStack {
-                Image(systemName: "sparkles")
-                    .foregroundColor(.yellow)
+                Image(systemName: "message.fill")
+                    .foregroundColor(.green)
                     .frame(width: 24)
                 
-                Text("ネタ表示")
+                Text("メッセージ表示")
                 
                 Spacer()
                 
-                Toggle("", isOn: .constant(true)) // 実際のアプリでは設定を保存
+                Toggle("", isOn: Binding(
+                    get: { showMotivationMessages },
+                    set: { newValue in
+                        showMotivationMessages = newValue
+                        UserDefaults.standard.set(newValue, forKey: "showMotivationMessages")
+                    }
+                ))
             }
         } header: {
             Text("表示設定")
         } footer: {
-            Text("距離換算やユーモアメッセージの表示を切り替えできます。")
-        }
-    }
-    
-    // MARK: - データ管理セクション
-    @ViewBuilder
-    private func DataManagementSection() -> some View {
-        Section {
-            Button(action: {
-                usageDataManager.saveCurrentData()
-            }) {
-                HStack {
-                    Image(systemName: "square.and.arrow.down")
-                        .foregroundColor(.blue)
-                        .frame(width: 24)
-                    
-                    Text("データを保存")
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                }
-            }
-            
-            Button(action: {
-                // データエクスポート機能（実装予定）
-            }) {
-                HStack {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.green)
-                        .frame(width: 24)
-                    
-                    Text("データをエクスポート")
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                }
-            }
-            
-            Button(action: {
-                // データリセット確認アラート表示（実装予定）
-            }) {
-                HStack {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                        .frame(width: 24)
-                    
-                    Text("データをリセット")
-                        .foregroundColor(.red)
-                    
-                    Spacer()
-                }
-            }
-        } header: {
-            Text("データ管理")
-        } footer: {
-            Text("使用時間データはすべて端末内に保存され、外部に送信されることはありません。")
-        }
-    }
-    
-    // MARK: - アプリ情報セクション
-    @ViewBuilder
-    private func AppInfoSection() -> some View {
-        Section {
-            HStack {
-                Image(systemName: "info.circle")
-                    .foregroundColor(.blue)
-                    .frame(width: 24)
-                
-                Text("バージョン")
-                
-                Spacer()
-                
-                Text("1.0.0")
-                    .foregroundColor(.secondary)
-            }
-            
-            Link(destination: URL(string: "https://github.com")!) {
-                HStack {
-                    Image(systemName: "link")
-                        .foregroundColor(.blue)
-                        .frame(width: 24)
-                    
-                    Text("GitHub")
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "arrow.up.right.square")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                }
-            }
-            
-            Link(destination: URL(string: "mailto:support@scrollcounter.app")!) {
-                HStack {
-                    Image(systemName: "envelope")
-                        .foregroundColor(.blue)
-                        .frame(width: 24)
-                    
-                    Text("お問い合わせ")
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "arrow.up.right.square")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
-                }
-            }
-        } header: {
-            Text("アプリ情報")
+            Text("健康アドバイスやモチベーションメッセージの表示を切り替えできます。")
         }
     }
     
@@ -347,49 +204,6 @@ struct SettingsView: View {
         if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(settingsUrl)
         }
-    }
-}
-
-// MARK: - 除外アプリ管理画面
-struct ExcludedAppsView: View {
-    @State private var excludedApps: Set<String> = []
-    @State private var availableApps = [
-        "Safari", "Chrome", "Twitter", "Instagram", "TikTok", "YouTube", 
-        "LINE", "Discord", "Slack", "Notion", "Reddit", "Pinterest"
-    ]
-    
-    var body: some View {
-        List {
-            Section {
-                ForEach(availableApps, id: \.self) { app in
-                    HStack {
-                        Image(systemName: "app.badge")
-                            .foregroundColor(.blue)
-                        
-                        Text(app)
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: Binding(
-                            get: { !excludedApps.contains(app) },
-                            set: { isIncluded in
-                                if isIncluded {
-                                    excludedApps.remove(app)
-                                } else {
-                                    excludedApps.insert(app)
-                                }
-                            }
-                        ))
-                    }
-                }
-            } header: {
-                Text("アプリ一覧")
-            } footer: {
-                Text("オフにしたアプリは使用時間の計測対象から除外されます。")
-            }
-        }
-        .navigationTitle("計測対象アプリ")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
